@@ -1,0 +1,15 @@
+{
+  "consumables": [
+    { "id": "erva_pulso", "name": "Erva Pulsante", "type": "heal", "healPulso": 50, "desc": "Restaura 50 Pulso." },
+    { "id": "cristal_eco_p", "name": "Cristal de Eco (P)", "type": "eco", "healEco": 30, "desc": "Restaura 30 Eco." },
+    { "id": "elixir_completo", "name": "Elixir de Véu", "type": "full_heal", "healPulso": 999, "healEco": 999, "desc": "Restaura tudo. Raro." }
+  ],
+  "materials": [
+    { "id": "ferro_F", "name": "Ferro Enferrujado", "quality": "F", "type": "material" },
+    { "id": "fios_D", "name": "Fios Elétricos", "quality": "D", "type": "material" },
+    { "id": "madeira_C", "name": "Madeira Reforçada", "quality": "C", "type": "material" },
+    { "id": "aco_B", "name": "Aço Reforçado", "quality": "B", "type": "material" },
+    { "id": "cristal_A", "name": "Cristal Entrópico", "quality": "A", "type": "material" },
+    { "id": "nucleo_S", "name": "Núcleo do Véu", "quality": "S", "type": "material" }
+  ]
+}
