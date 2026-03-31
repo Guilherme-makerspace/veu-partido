@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Véu Partido — GDD Técnico</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0d0c10;
+    --bg2: #13121a;
+    --bg3: #1b1926;
+    --surface: #201e2e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8e4f0;
+    --muted: #8a86a0;
+    --accent: #7c6af7;
+    --accent2: #c47afe;
+    --red: #e05c6a;
+    --amber: #e09a3a;
+    --teal: #3ec9a0;
+    --blue: #5aaaee;
+    --pink: #e86aa8;
+    --green: #6bcf8a;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Crimson Pro', serif;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 60px 40px 120px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 80px 0 60px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 60px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 72px;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #e8e4f0, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 1px;
+    margin-top: 16px;
+  }
+  .hero-chips {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .chip.accent { border-color: var(--accent); color: var(--accent); }
+
+  /* ── NAV ── */
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 60px;
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 40px;
+  }
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-family: var(--mono);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toc a::before { content: '//'; color: var(--border2); }
+  .toc a:hover { color: var(--accent2); }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 72px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0.7;
+    min-width: 24px;
+  }
+  .section h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 32px;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  /* ── HEADINGS ── */
+  h3 {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin: 28px 0 12px;
+  }
+  h4 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 20px 0 8px;
+  }
+  p { color: var(--muted); margin-bottom: 12px; }
+  p strong { color: var(--text); font-weight: 500; }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .card-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .card h4 { margin: 0 0 8px; font-size: 16px; }
+  .card p { font-size: 13px; margin: 0; line-height: 1.5; }
+
+  .card.metamorfo { border-top: 2px solid var(--teal); }
+  .card.metamorfo .card-label { color: var(--teal); }
+  .card.duelista { border-top: 2px solid var(--blue); }
+  .card.duelista .card-label { color: var(--blue); }
+  .card.xama { border-top: 2px solid var(--accent2); }
+  .card.xama .card-label { color: var(--accent2); }
+  .card.voraz { border-top: 2px solid var(--red); }
+  .card.voraz .card-label { color: var(--red); }
+
+  /* ── STAT CARDS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .stat-letter {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .stat-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .stat-equiv { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .stat-tech { font-size: 10px; color: var(--blue); margin-top: 4px; font-family: var(--mono); }
+  .stat-magic { font-size: 10px; color: var(--accent2); margin-top: 2px; font-family: var(--mono); }
+
+  /* ── CODE BLOCK (folder tree) ── */
+  .code-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .code-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .code-dot.r { background: #e05c6a44; border: 1px solid #e05c6a88; }
+  .code-dot.y { background: #e09a3a44; border: 1px solid #e09a3a88; }
+  .code-dot.g { background: #6bcf8a44; border: 1px solid #6bcf8a88; }
+  .code-filename { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 4px; }
+  pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    padding: 20px 24px;
+    overflow-x: auto;
+    color: var(--text);
+  }
+  .dir  { color: var(--accent2); }
+  .file { color: var(--muted); }
+  .cmt  { color: #4a4760; }
+
+  /* ── SKILL TREE TABLE ── */
+  .skill-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+  .skill-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+  }
+  .skill-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  .skill-table tr:last-child td { border-bottom: none; }
+  .skill-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .tag-tech { color: var(--blue); font-family: var(--mono); }
+  .tag-magic { color: var(--accent2); font-family: var(--mono); }
+  .tag-stat { font-family: var(--mono); font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--surface); }
+
+  /* ── AUDIO TABLE ── */
+  .audio-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+  .audio-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+  }
+  .audio-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* ── PROMPT BOX ── */
+  .prompt-box {
+    background: var(--bg2);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .prompt-header {
+    background: rgba(124,106,247,0.1);
+    padding: 12px 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prompt-header::before { content: '▶'; font-size: 9px; }
+  .prompt-body {
+    padding: 24px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+  .prompt-body strong { color: var(--text); }
+  .prompt-body em { color: var(--accent2); font-style: normal; }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    margin-top: 20px;
+    border-left: 2px solid var(--border);
+    padding-left: 24px;
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -30px; top: 6px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+  .timeline-week {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .timeline-title { font-weight: 500; color: var(--text); font-size: 14px; }
+  .timeline-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* ── TEAM GRID ── */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .team-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .team-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+  .team-role { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  .team-name { font-size: 12px; font-weight: 500; color: var(--text); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* ── COMBO TABLE ── */
+  .combo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 16px;
+  }
+  .combo-table th {
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .combo-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .combo-table td:first-child { color: var(--text); font-weight: 500; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; color: black; }
+    .hero::before { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Game Design Document v1.0</div>
+  <h1>Véu Partido</h1>
+  <div class="hero-sub">RPG 2D · Phaser.js · Raspberry Pi 4 · 2 Jogadores</div>
+  <div class="hero-chips">
+    <span class="chip accent">Phaser.js</span>
+    <span class="chip">Raspberry Pi 4 Model B (8GB)</span>
+    <span class="chip">2 Players Obrigatório</span>
+    <span class="chip">Universal LPC Spritesheet Generator</span>
+    <span class="chip">Suno AI Audio</span>
+    <span class="chip">5 pessoas</span>
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <div class="toc-title">Índice</div>
+  <div class="toc-grid">
+    <a href="#classes">01 — Classes & Personagens</a>
+    <a href="#stats">02 — Sistema de Vestígios (Stats)</a>
+    <a href="#skilltree">03 — Árvore de Habilidades</a>
+    <a href="#combos">04 — Sistema de Combos</a>
+    <a href="#audio">05 — Sistema de Áudio</a>
+    <a href="#estrutura">06 — Estrutura de Pastas</a>
+    <a href="#pipeline">07 — Pipeline de Desenvolvimento</a>
+    <a href="#time">08 — Divisão do Time</a>
+    <a href="#prompt">09 — Prompt para IA de Programação</a>
+  </div>
+</div>
+
+<!-- ══ 01 CLASSES ══ -->
+<div class="section" id="classes">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Classes & Personagens</h2>
+  </div>
+
+  <h3>Tecnológicos (Nomes de Habilidades em Alemão)</h3>
+  <div class="card-grid">
+    <div class="card metamorfo">
+      <div class="card-label">Metamorfo · Tecnológico</div>
+      <h4>Caio — o Absorvedor</h4>
+      <p>Ao derrotar inimigos, coleta <strong>Essências</strong> que destrava traços passivos acumulativos. Com essências suficientes, combina características de múltiplos inimigos em habilidades únicas. Silencioso, analítico, identidade fragmentada.</p>
+      <p style="margin-top:10px; color: var(--teal); font-size:12px; font-family: var(--mono);">
+        Mecânica-chave: após vencer, acessa menu "Absorver Essência" → desbloqueia traits passivos progressivos. Quanto mais biomas explorados, mais exótica fica a combinação.
+      </p>
+    </div>
+    <div class="card duelista">
+      <div class="card-label">Duelista · Tecnológico</div>
+      <h4>Rael — o Improvisador</h4>
+      <p>Atirador de longa distância com reação rápida. Pega <strong>qualquer objeto do chão</strong> e cria armas baseadas no material coletado — sucata vira besta, fios elétricos viram chicote condutor. Confiante, irônico, nunca para quieto.</p>
+      <p style="margin-top:10px; color: var(--blue); font-size:12px; font-family: var(--mono);">
+        Mecânica-chave: sistema de crafting instantâneo baseado em "qualidade do material" (F/D/C/B/A/S). Materiais raros criam armas únicas por batalha.
+      </p>
+    </div>
+    <div class="card xama">
+      <div class="card-label">Xamã · Mágico</div>
+      <h4>Sura — a Quebradora de Ordem</h4>
+      <p>Lança <strong>Mantras</strong> que são maldições contra a realidade. Três caminhos: <strong>Depredação</strong> (físico/mental), <strong>Desastre</strong> (elemental), <strong>Místico</strong> (arcano/necromante). Centro moral do grupo, peso em cada palavra.</p>
+      <p style="margin-top:10px; color: var(--accent2); font-size:12px; font-family: var(--mono);">
+        Mecânica-chave: mantras custam Eco. Usar mantras de caminhos diferentes aumenta "Dissonância" — debuff/buff dependendo do Limiar.
+      </p>
+    </div>
+    <div class="card voraz">
+      <div class="card-label">Voraz · Mágico</div>
+      <h4>Dren — o Amaldiçoado</h4>
+      <p>Absorve maldições de inimigos e NPCs, alterando características físicas. <strong>Fome:</strong> +Véu, −Pulso por turno. <strong>Preguiça:</strong> −Véu, −custo de Eco. Pode empilhar até 3 maldições. Cínico, exausto, se importa mais do que admite.</p>
+      <p style="margin-top:10px; color: var(--red); font-size:12px; font-family: var(--mono);">
+        Mecânica-chave: "Revenge Counter" — acumula dano recebido como carga, libera em burst. Maldições ativas modificam qual burst é disponível.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 02 STATS ══ -->
+<div class="section" id="stats">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>Sistema de Vestígios</h2>
+  </div>
+
+  <p>Os cinco Vestígios são os stats do jogo — o que restou do Véu dentro de cada Marcado. Nas classes <strong>Tecnológicas</strong>, os nomes da árvore usam terminologia <strong>alemã</strong>. Nas classes <strong>Mágicas</strong>, terminologia <strong>russa</strong>.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-letter" style="color: var(--red);">F</div>
+      <div class="stat-name">Fratura</div>
+      <div class="stat-equiv">≡ Força</div>
+      <div class="stat-tech">DE: Bruch</div>
+      <div class="stat-magic">RU: Разлом</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-letter" style="color: var(--green);">P</div>
+      <div class="stat-name">Pulso</div>
+      <div class="stat-equiv">≡ Vitalidade</div>
+      <div class="stat-tech">DE: Puls</div>
+      <div class="stat-magic">RU: Пульс</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-letter" style="color: var(--teal);">E</div>
+      <div class="stat-name">Eco</div>
+      <div class="stat-equiv">≡ Mana</div>
+      <div class="stat-tech">DE: Echo</div>
+      <div class="stat-magic">RU: Эхо</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-letter" style="color: var(--accent2);">V</div>
+      <div class="stat-name">Véu</div>
+      <div class="stat-equiv">≡ Velocidade</div>
+      <div class="stat-tech">DE: Schleier</div>
+      <div class="stat-magic">RU: Покров</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-letter" style="color: var(--amber);">L</div>
+      <div class="stat-name">Limiar</div>
+      <div class="stat-equiv">≡ Mentalidade</div>
+      <div class="stat-tech">DE: Schwelle</div>
+      <div class="stat-magic">RU: Порог</div>
+    </div>
+  </div>
+
+  <h3>Mecânicas dos Stats</h3>
+  <table class="skill-table">
+    <tr>
+      <th>Vestígio</th>
+      <th>Alto</th>
+      <th>Baixo / Zero</th>
+      <th>Nota especial</th>
+    </tr>
+    <tr>
+      <td><strong>Fratura</strong></td>
+      <td>Golpes deformam ambiente, não só inimigo</td>
+      <td>Corpo resiste ao fragmento</td>
+      <td>Metamorfo: escala com nº de essências</td>
+    </tr>
+    <tr>
+      <td><strong>Pulso</strong></td>
+      <td>Sobrevive ao que deveria matar</td>
+      <td>Colapso (não morte imediata)</td>
+      <td>Colapso dura 2 turnos antes de KO</td>
+    </tr>
+    <tr>
+      <td><strong>Eco</strong></td>
+      <td>Habilidades especiais disponíveis</td>
+      <td>Habilidades bloqueadas</td>
+      <td>Recupera por derrotar inimigos / pontos de Véu espesso</td>
+    </tr>
+    <tr>
+      <td><strong>Véu</strong></td>
+      <td>Esquivas impossíveis, turno extra</td>
+      <td>Cada ação custa mais do que deveria</td>
+      <td>Dren: Fome aumenta, Preguiça diminui</td>
+    </tr>
+    <tr>
+      <td><strong>Limiar</strong></td>
+      <td>Habilidades estáveis, maldições com controle</td>
+      <td>Fragmento vencendo — perigoso OU poderoso</td>
+      <td>Baixo Limiar no Voraz ativa modo caótico</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ══ 03 SKILL TREE ══ -->
+<div class="section" id="skilltree">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Árvore de Habilidades</h2>
+  </div>
+
+  <p>Inspirada nas cartinhas de talento do <strong>Deepwoken</strong>, mas implementada como <strong>árvore nodal</strong> em vez de cartas. Cada personagem tem <strong>5 ramos</strong> (um por Vestígio). Pontos de habilidade são ganhos ao subir de nível. Nós desbloqueados abrem nós vizinhos.</p>
+  <p>Classes tecnológicas exibem os ramos com <strong>nomes alemães</strong>. Classes mágicas com <strong>nomes russos</strong>. A mecânica é idêntica — apenas a apresentação muda.</p>
+
+  <h3>Metamorfo — Caio (Alemão / Tecnológico)</h3>
+  <table class="skill-table">
+    <tr>
+      <th>Ramo (Vestígio)</th>
+      <th>Nome exibido</th>
+      <th>Tier 1</th>
+      <th>Tier 2</th>
+      <th>Tier 3 (Ultimate)</th>
+    </tr>
+    <tr>
+      <td><span class="tag-stat">Fratura</span></td>
+      <td class="tag-tech">Bruch-Linie</td>
+      <td>Golpe absorve 5% da essência bruta</td>
+      <td>Essência potencializa Fratura em +20% por stack</td>
+      <td><strong>Fragmento Composto</strong> — funde 3 essências em ataque único</td>
+    </tr>
+    <tr>
+      <td><span class="tag-stat">Pulso</span></td>
+      <td class="tag-tech">Puls-Kern</td>
+      <td>Regenera 5 Pulso ao absorver essência</td>
+      <td>Essência de criatura resistente concede escudo temporário</td>
+      <td><strong>Núcleo Híbrido</strong> — Pulso máximo +30% quando 5+ essências ativas</td>
+    </tr>
+    <tr>
+      <td><span class="tag-stat">Eco</span></td>
+      <td class="tag-tech">Echo-Spur</td>
+      <td>Reduz custo de absorção em 1 Eco</td>
+      <td>Essência duplicada gera Eco extra</td>
+      <td><strong>Ressonância Primordial</strong> — gratuito absorver por 3 turnos</td>
+    </tr>
+    <tr>
+      <td><span class="tag-stat">Véu</span></td>
+      <td class="tag-tech">Schleier-Schritt</td>
+      <td>Essência voadora concede +1 Véu</td>
+      <td>Pode usar mobilidade de qualquer essência ativa</td>
+      <td><strong>Passo Composto</strong> — teleporte curto 1×/batalha</td>
+    </tr>
+    <tr>
+      <td><span class="tag-stat">Limiar</span></td>
+      <td class="tag-tech">Schwelle-Form</td>
+      <td>+1 slot de essência ativa</td>
+      <td>Essências opostas não causam instabilidade</td>
+      <td><strong>Além da Forma</strong> — assume traço de essência sem custo de Limiar</td>
+    </tr>
+  </table>
+
+  <h3>Duelista — Rael (Alemão / Tecnológico)</h3>
+  <table class="skill-table">
+    <tr><th>Ramo</th><th>Nome exibido</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr>
+    <tr><td><span class="tag-stat">Fratura</span></td><td class="tag-tech">Bruch-Schuss</td><td>Projéteis improvisados penetram armadura leve</td><td>Arma B+ perfura armadura média</td><td><strong>Disparo de Ruptura</strong> — ignora toda armadura por 1 tiro</td></tr>
+    <tr><td><span class="tag-stat">Pulso</span></td><td class="tag-tech">Puls-Reflex</td><td>Esquiva instantânea quando Véu ≥ 3</td><td>Esquiva dispara contra-ataque automático</td><td><strong>Fluxo de Combate</strong> — 2 ações no mesmo turno se esquivou</td></tr>
+    <tr><td><span class="tag-stat">Eco</span></td><td class="tag-tech">Echo-Bau</td><td>Crafting custa −1 Eco</td><td>Material S cria arma com habilidade de Eco</td><td><strong>Arquiteto de Fluxo</strong> — 1 arma ativa por batalha sem custo</td></tr>
+    <tr><td><span class="tag-stat">Véu</span></td><td class="tag-tech">Schleier-Zug</td><td>+2 Véu ao segurar arma ranged</td><td>Pode reposicionar após cada disparo</td><td><strong>Linha de Fluxo</strong> — atravessa campo de batalha em 1 ação</td></tr>
+    <tr><td><span class="tag-stat">Limiar</span></td><td class="tag-tech">Schwelle-Sinn</td><td>Detecta qualidade de materiais no chão</td><td>Enxerga pontos fracos (crit +15%)</td><td><strong>Intuição Total</strong> — sempre sabe a melhor arma possível disponível</td></tr>
+  </table>
+
+  <h3>Xamã — Sura (Russo / Mágico)</h3>
+  <table class="skill-table">
+    <tr><th>Ramo</th><th>Nome exibido</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr>
+    <tr><td><span class="tag-stat">Fratura</span></td><td class="tag-magic">Разлом-Слово</td><td>Mantras de Depredação custam −1 Eco</td><td>Maldição física dura +1 turno</td><td><strong>Palavra de Ruína</strong> — maldição que reduz Fratura inimiga em 50%</td></tr>
+    <tr><td><span class="tag-stat">Pulso</span></td><td class="tag-magic">Пульс-Щит</td><td>Mantra defensivo absorve 10 de dano</td><td>Desastre cura aliado em 15% do dano causado</td><td><strong>Pulso Inverso</strong> — converte dano recebido em Pulso por 2 turnos</td></tr>
+    <tr><td><span class="tag-stat">Eco</span></td><td class="tag-magic">Эхо-Закон</td><td>+2 Eco ao quebrar uma lei da realidade</td><td>Mantras Místicos regeneram Eco ao acertar</td><td><strong>Lei do Eco</strong> — próximo mantra gratuito após 3 mantras seguidos</td></tr>
+    <tr><td><span class="tag-stat">Véu</span></td><td class="tag-magic">Покров-Путь</td><td>Mantras de Desastre têm alcance +30%</td><td>Pode lançar mantra em movimento</td><td><strong>Cobertura do Véu</strong> — mantras afetam área 2× e não gastam posição</td></tr>
+    <tr><td><span class="tag-stat">Limiar</span></td><td class="tag-magic">Порог-Разум</td><td>Dissonância entre caminhos −20%</td><td>Baixo Limiar não cancela mantras</td><td><strong>Além do Limiar</strong> — usa os 3 caminhos sem penalidade de Dissonância</td></tr>
+  </table>
+
+  <h3>Voraz — Dren (Russo / Mágico)</h3>
+  <table class="skill-table">
+    <tr><th>Ramo</th><th>Nome exibido</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th></tr>
+    <tr><td><span class="tag-stat">Fratura</span></td><td class="tag-magic">Разлом-Гнев</td><td>Burst de Revenge acerta −10% Fratura inimiga</td><td>Maldição de Fome: burst causa dano bônus</td><td><strong>Ira Entrópica</strong> — burst triple com 3 maldições ativas</td></tr>
+    <tr><td><span class="tag-stat">Pulso</span></td><td class="tag-magic">Пульс-Дрен</td><td>Absorver maldição restaura 10 Pulso</td><td>Em Colapso, ativa Revenge automaticamente</td><td><strong>Consumo Total</strong> — se Pulso zerar com maldição ativa, revive com 30%</td></tr>
+    <tr><td><span class="tag-stat">Eco</span></td><td class="tag-magic">Эхо-Поток</td><td>Maldição de Preguiça −2 custo de Eco</td><td>Acumular 2 maldições gera +5 Eco</td><td><strong>Fluxo Corrompido</strong> — habilidades gratuitas por 2 turnos após burst</td></tr>
+    <tr><td><span class="tag-stat">Véu</span></td><td class="tag-magic">Покров-Голод</td><td>Fome: +2 Véu, −3 Pulso/turno</td><td>Com 2 maldições, esquiva não gasta ação</td><td><strong>Fuga do Amaldiçoado</strong> — teleporte de emergência ao atingir Colapso</td></tr>
+    <tr><td><span class="tag-stat">Limiar</span></td><td class="tag-magic">Порог-Хаос</td><td>Baixo Limiar: Revenge acumula 20% mais rápido</td><td>Maldição de Preguiça estabiliza Limiar</td><td><strong>Caos Controlado</strong> — com Limiar crítico, converte instabilidade em dano puro</td></tr>
+  </table>
+</div>
+
+<!-- ══ 04 COMBOS ══ -->
+<div class="section" id="combos">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Sistema de Combos entre Jogadores</h2>
+  </div>
+  <p>Como o jogo é <strong>obrigatoriamente 2 jogadores</strong>, combos de classe são o núcleo do design de batalha. Cada par de classes tem pelo menos 2 combos sinérgicos.</p>
+  <table class="combo-table">
+    <tr>
+      <th>Combo</th>
+      <th>Classes</th>
+      <th>Como funciona</th>
+      <th>Efeito</th>
+    </tr>
+    <tr>
+      <td>Eco Compartilhado</td>
+      <td>Xamã + Voraz</td>
+      <td>Sura lança mantra Místico em Dren enquanto ele tem maldição ativa</td>
+      <td>Maldição vira combustível — Eco de Dren +8, próximo burst é elemental</td>
+    </tr>
+    <tr>
+      <td>Essência Armada</td>
+      <td>Metamorfo + Duelista</td>
+      <td>Caio absorve essência de criatura voadora; Rael pede a essência via ação de troca</td>
+      <td>Rael cria projétil com traço da criatura (veneno, elétrico etc.) por 3 disparos</td>
+    </tr>
+    <tr>
+      <td>Maldição Transferida</td>
+      <td>Voraz + qualquer</td>
+      <td>Dren transfere 1 maldição ao aliado voluntariamente</td>
+      <td>Aliado recebe debuff + stat bonus do tipo da maldição por 2 turnos</td>
+    </tr>
+    <tr>
+      <td>Ruptura em Cadeia</td>
+      <td>Xamã + Duelista</td>
+      <td>Sura debilita inimigo com maldição de Fratura; Rael dispara imediatamente</td>
+      <td>Disparo ignora armadura + aplica "Fragmentado" (vulnerável a próximos golpes)</td>
+    </tr>
+    <tr>
+      <td>Sombra de Véu</td>
+      <td>Metamorfo + Xamã</td>
+      <td>Caio com essência de criatura invisível + Sura lança Pokrov no aliado</td>
+      <td>Caio fica intangível por 1 turno — dano recebido zero</td>
+    </tr>
+    <tr>
+      <td>Engrenagem de Caos</td>
+      <td>Duelista + Voraz</td>
+      <td>Rael cria arma de material S; Dren com Fome ativa usa a arma emprestada</td>
+      <td>Dren aplica burst através da arma de Rael — dano físico + entrópico combinados</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ══ 05 AUDIO ══ -->
+<div class="section" id="audio">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>Sistema de Áudio</h2>
+  </div>
+  <p>Referência principal: <strong>Undertale</strong> — bips por personagem + trilha chiptune. Geração de músicas via <strong>Suno AI</strong>. Sons implementados com <strong>pygame.mixer</strong> (se necessário no Pi) ou <strong>Phaser.Sound</strong>.</p>
+
+  <h3>Trilhas Sonoras</h3>
+  <table class="audio-table">
+    <tr><th>Cena</th><th>Estilo</th><th>Arquivo</th><th>Loop</th></tr>
+    <tr><td>Abertura</td><td>Dark chiptune, misterioso e melancólico</td><td>theme_opening.ogg</td><td>Sim</td></tr>
+    <tr><td>Menu</td><td>Ambient chiptune suave</td><td>theme_menu.ogg</td><td>Sim</td></tr>
+    <tr><td>Exploração</td><td>Sombrio e tenso, mundo em decadência</td><td>theme_explore.ogg</td><td>Sim</td></tr>
+    <tr><td>Batalha</td><td>Caótico e intenso, energia entrópica</td><td>theme_battle.ogg</td><td>Sim</td></tr>
+    <tr><td>Boss</td><td>Opressivo, realidade se desfazendo</td><td>theme_boss.ogg</td><td>Sim</td></tr>
+    <tr><td>Dungeon</td><td>Ambient dark chiptune, perturbador</td><td>theme_dungeon.ogg</td><td>Sim</td></tr>
+    <tr><td>Cidade</td><td>Melancólico mas aconchegante</td><td>theme_city.ogg</td><td>Sim</td></tr>
+    <tr><td>Game Over</td><td>Fading melody, 10 segundos</td><td>theme_gameover.ogg</td><td>Não</td></tr>
+    <tr><td>Ending</td><td>Bittersweet, vitória melancólica</td><td>theme_ending.ogg</td><td>Não</td></tr>
+  </table>
+
+  <h3>Bips dos Personagens (Diálogo)</h3>
+  <table class="audio-table">
+    <tr><th>Personagem</th><th>Timbre</th><th>Velocidade</th><th>Arquivo</th><th>Ferramenta</th></tr>
+    <tr><td>Caio</td><td>Grave</td><td>Lento, espaçado</td><td>blip_caio.ogg</td><td>ChipTone</td></tr>
+    <tr><td>Rael</td><td>Agudo</td><td>Rápido, irregular</td><td>blip_rael.ogg</td><td>Leshy SFX</td></tr>
+    <tr><td>Sura</td><td>Médio</td><td>Firme, cadenciado</td><td>blip_sura.ogg</td><td>ChipTone</td></tr>
+    <tr><td>Dren</td><td>Rouco, médio-grave</td><td>Irregular</td><td>blip_dren.ogg</td><td>ChipTone</td></tr>
+  </table>
+
+  <h3>SFX Necessários</h3>
+  <table class="audio-table">
+    <tr><th>Ação</th><th>Arquivo</th></tr>
+    <tr><td>Absorver essência (Metamorfo)</td><td>sfx_absorb.ogg</td></tr>
+    <tr><td>Crafting de arma (Duelista)</td><td>sfx_craft.ogg</td></tr>
+    <tr><td>Lançar mantra (Xamã)</td><td>sfx_mantra_[depredacao|desastre|mistico].ogg</td></tr>
+    <tr><td>Burst do Voraz</td><td>sfx_burst_[small|medium|big].ogg</td></tr>
+    <tr><td>Absorver maldição (Voraz)</td><td>sfx_curse_absorb.ogg</td></tr>
+    <tr><td>Colapso (Pulso zero)</td><td>sfx_collapse.ogg</td></tr>
+    <tr><td>Combo ativado</td><td>sfx_combo.ogg</td></tr>
+    <tr><td>Level up / Ponto de habilidade</td><td>sfx_levelup.ogg</td></tr>
+    <tr><td>Menu navegar / selecionar</td><td>sfx_menu_nav.ogg / sfx_menu_select.ogg</td></tr>
+  </table>
+</div>
+
+<!-- ══ 06 ESTRUTURA ══ -->
+<div class="section" id="estrutura">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>Estrutura de Pastas</h2>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <div class="code-dot r"></div>
+      <div class="code-dot y"></div>
+      <div class="code-dot g"></div>
+      <span class="code-filename">veu-partido/</span>
+    </div>
+    <pre><span class="dir">veu-partido/</span>
+<span class="cmt">│</span>
+<span class="cmt">├─</span> <span class="file">index.html</span>              <span class="cmt">← entrada do Phaser.js</span>
+<span class="cmt">├─</span> <span class="file">package.json</span>
+<span class="cmt">├─</span> <span class="file">vite.config.js</span>         <span class="cmt">← bundler (recomendado para Pi)</span>
+<span class="cmt">│</span>
+<span class="dir">├─ src/</span>
+<span class="cmt">│  ├─</span> <span class="file">main.js</span>               <span class="cmt">← config Phaser (scale, physics, scenes)</span>
+<span class="cmt">│  ├─</span> <span class="file">constants.js</span>          <span class="cmt">← TILE_SIZE, SCREEN_W/H, VESTÍGIO base values</span>
+<span class="cmt">│  │</span>
+<span class="dir">│  ├─ scenes/</span>
+<span class="cmt">│  │  ├─</span> <span class="file">BootScene.js</span>        <span class="cmt">← carrega assets mínimos + define globals</span>
+<span class="cmt">│  │  ├─</span> <span class="file">PreloadScene.js</span>     <span class="cmt">← progress bar + carrega todos os assets</span>
+<span class="cmt">│  │  ├─</span> <span class="file">TitleScene.js</span>       <span class="cmt">← tela de abertura animada, skip para menu</span>
+<span class="cmt">│  │  ├─</span> <span class="file">MenuScene.js</span>        <span class="cmt">← Começar / Sair</span>
+<span class="cmt">│  │  ├─</span> <span class="file">CharSelectScene.js</span>  <span class="cmt">← P1 e P2 escolhem classes (obrigatório 2P)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">WorldMapScene.js</span>    <span class="cmt">← mapa overworld, acesso a zonas</span>
+<span class="cmt">│  │  ├─</span> <span class="file">ExploreScene.js</span>     <span class="cmt">← exploração 2D top-down co-op</span>
+<span class="cmt">│  │  ├─</span> <span class="file">BattleScene.js</span>      <span class="cmt">← combate turn-based, sistema de combos</span>
+<span class="cmt">│  │  ├─</span> <span class="file">DialogScene.js</span>      <span class="cmt">← overlay de diálogo (bips por personagem)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">SkillTreeScene.js</span>   <span class="cmt">← UI da árvore de habilidades (por personagem)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">ScoreScene.js</span>       <span class="cmt">← score tracker, exibido entre zonas</span>
+<span class="cmt">│  │  ├─</span> <span class="file">GameOverScene.js</span>    <span class="cmt">← game over (ambos KO)</span>
+<span class="cmt">│  │  └─</span> <span class="file">EndingScene.js</span>      <span class="cmt">← ending + score final</span>
+<span class="cmt">│  │</span>
+<span class="dir">│  ├─ entities/</span>
+<span class="dir">│  │  ├─ players/</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">Player.js</span>         <span class="cmt">← classe base: vestígios, input, estado</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">Metamorfo.js</span>      <span class="cmt">← Caio: absorção, slots de essência</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">Duelista.js</span>       <span class="cmt">← Rael: crafting, armas temporárias</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">Xama.js</span>           <span class="cmt">← Sura: mantras, caminhos, dissonância</span>
+<span class="cmt">│  │  │  └─</span> <span class="file">Voraz.js</span>          <span class="cmt">← Dren: maldições, revenge counter, burst</span>
+<span class="dir">│  │  ├─ enemies/</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">Enemy.js</span>          <span class="cmt">← base: AI, drops, essência exportável</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">EnemyTypes.js</span>     <span class="cmt">← dicionário de tipos (para Metamorfo)</span>
+<span class="cmt">│  │  │  └─</span> <span class="file">BossEnemy.js</span>      <span class="cmt">← boss: fases, mecânica especial</span>
+<span class="dir">│  │  └─ npcs/</span>
+<span class="cmt">│  │     ├─</span> <span class="file">NPC.js</span>            <span class="cmt">← base: diálogo, maldições transferíveis</span>
+<span class="cmt">│  │     └─</span> <span class="file">NPCTypes.js</span>       <span class="cmt">← configurações por tipo de NPC</span>
+<span class="cmt">│  │</span>
+<span class="dir">│  ├─ systems/</span>
+<span class="cmt">│  │  ├─</span> <span class="file">BattleSystem.js</span>     <span class="cmt">← turno, ordem por Véu, resolução de ação</span>
+<span class="cmt">│  │  ├─</span> <span class="file">ComboSystem.js</span>      <span class="cmt">← detecta combinações 2P, dispara efeito</span>
+<span class="cmt">│  │  ├─</span> <span class="file">SkillTreeSystem.js</span>  <span class="cmt">← unlock de nós, custo, prerequisitos</span>
+<span class="cmt">│  │  ├─</span> <span class="file">DialogSystem.js</span>     <span class="cmt">← fila de falas, bip por personagem, skip</span>
+<span class="cmt">│  │  ├─</span> <span class="file">CraftingSystem.js</span>   <span class="cmt">← lógica de qualidade de material (Duelista)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">CurseSystem.js</span>      <span class="cmt">← pilha de maldições, efeitos, transferência</span>
+<span class="cmt">│  │  ├─</span> <span class="file">EssenceSystem.js</span>   <span class="cmt">← slots, combinação de essências (Metamorfo)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">ScoreSystem.js</span>      <span class="cmt">← score por ação, multiplicadores</span>
+<span class="cmt">│  │  └─</span> <span class="file">AudioSystem.js</span>      <span class="cmt">← controle de música, bips, SFX (Phaser.Sound)</span>
+<span class="cmt">│  │</span>
+<span class="dir">│  ├─ ui/</span>
+<span class="cmt">│  │  ├─</span> <span class="file">HUD.js</span>              <span class="cmt">← barras de Pulso/Eco/Véu dos 2 jogadores</span>
+<span class="cmt">│  │  ├─</span> <span class="file">BattleMenu.js</span>       <span class="cmt">← menu de ações em combate (Atacar, Habilidade…)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">DialogBox.js</span>        <span class="cmt">← caixa de texto estilo Undertale</span>
+<span class="cmt">│  │  ├─</span> <span class="file">SkillTreeUI.js</span>      <span class="cmt">← renderiza árvore nodal, nomes por classe</span>
+<span class="cmt">│  │  ├─</span> <span class="file">EssenceSlotUI.js</span>   <span class="cmt">← slots visuais de essência (Metamorfo)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">CurseStackUI.js</span>     <span class="cmt">← stack visual de maldições (Voraz)</span>
+<span class="cmt">│  │  ├─</span> <span class="file">CraftingUI.js</span>       <span class="cmt">← preview de arma craftada (Duelista)</span>
+<span class="cmt">│  │  └─</span> <span class="file">ScoreUI.js</span>          <span class="cmt">← exibição de pontuação e multiplicadores</span>
+<span class="cmt">│  │</span>
+<span class="dir">│  └─ data/</span>
+<span class="cmt">│     ├─</span> <span class="file">characters.json</span>     <span class="cmt">← stats base dos 4 personagens</span>
+<span class="cmt">│     ├─</span> <span class="file">enemies.json</span>        <span class="cmt">← inimigos: stats, essência, drops, maldições</span>
+<span class="cmt">│     ├─</span> <span class="file">skills.json</span>         <span class="cmt">← toda a árvore de habilidades (todos os ramos)</span>
+<span class="cmt">│     ├─</span> <span class="file">items.json</span>          <span class="cmt">← materiais, qualidades, itens de cura</span>
+<span class="cmt">│     ├─</span> <span class="file">curses.json</span>         <span class="cmt">← tipos de maldições e seus efeitos</span>
+<span class="cmt">│     ├─</span> <span class="file">combos.json</span>         <span class="cmt">← combinações de habilidades entre classes</span>
+<span class="cmt">│     └─</span> <span class="file">dialogue.json</span>       <span class="cmt">← todas as falas, por personagem e cena</span>
+<span class="cmt">│</span>
+<span class="dir">├─ assets/</span>
+<span class="dir">│  ├─ sprites/</span>
+<span class="dir">│  │  ├─ players/</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">caio_sheet.png</span>    <span class="cmt">← spritesheet LPC (idle, walk, attack, collapse)</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">rael_sheet.png</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">sura_sheet.png</span>
+<span class="cmt">│  │  │  └─</span> <span class="file">dren_sheet.png</span>
+<span class="dir">│  │  ├─ enemies/</span>
+<span class="cmt">│  │  │  └─</span> <span class="file">[tipo]_sheet.png</span>  <span class="cmt">← por tipo de inimigo</span>
+<span class="dir">│  │  ├─ tiles/</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">world_tiles.png</span>  <span class="cmt">← tileset exploração</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">dungeon_tiles.png</span>
+<span class="cmt">│  │  │  └─</span> <span class="file">city_tiles.png</span>
+<span class="dir">│  │  ├─ ui/</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">hud_frame.png</span>
+<span class="cmt">│  │  │  ├─</span> <span class="file">dialog_box.png</span>
+<span class="cmt">│  │  │  └─</span> <span class="file">skill_node_[locked|unlocked|active].png</span>
+<span class="dir">│  │  └─ effects/</span>
+<span class="cmt">│  │     └─</span> <span class="file">[efeito]_anim.png</span> <span class="cmt">← burst, mantra, absorção etc.</span>
+<span class="dir">│  ├─ audio/</span>
+<span class="dir">│  │  ├─ music/</span>
+<span class="cmt">│  │  │  └─</span> <span class="file">theme_[cena].ogg</span>
+<span class="dir">│  │  └─ sfx/</span>
+<span class="cmt">│  │     ├─</span> <span class="file">blip_[personagem].ogg</span>
+<span class="cmt">│  │     └─</span> <span class="file">sfx_[acao].ogg</span>
+<span class="dir">│  ├─ maps/</span>
+<span class="cmt">│  │  └─</span> <span class="file">[zona].json</span>         <span class="cmt">← Tiled map exports (.json, não .tmx)</span>
+<span class="dir">│  └─ fonts/</span>
+<span class="cmt">│     └─</span> <span class="file">pixel_font.ttf</span>
+<span class="cmt">│</span>
+<span class="dir">├─ tools/</span>
+<span class="cmt">│  ├─</span> <span class="file">spritesheet_prompt.md</span> <span class="cmt">← prompt para LPC generator (configs por personagem)</span>
+<span class="cmt">│  └─</span> <span class="file">suno_prompts.md</span>       <span class="cmt">← prompts de geração das músicas</span>
+<span class="cmt">│</span>
+<span class="file">└─ README.md</span>                  <span class="cmt">← setup, como rodar no Pi 4, controles</span></pre>
+  </div>
+</div>
+
+<!-- ══ 07 PIPELINE ══ -->
+<div class="section" id="pipeline">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>Pipeline de Desenvolvimento</h2>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-week">Semana 1</div>
+      <div class="timeline-title">Fundação técnica</div>
+      <div class="timeline-desc">Setup Phaser.js + Vite no Pi 4. BootScene, PreloadScene, TitleScene e MenuScene funcionando. Controles 2P mapeados (teclado dividido ou dois gamepads). Sistema de cenas pronto.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Semana 2</div>
+      <div class="timeline-title">Entidades e dados</div>
+      <div class="timeline-desc">CharSelectScene, classes Player + as 4 subclasses. Sistema de Vestígios completo. JSON de personagens, inimigos e habilidades. ExploreScene básica com movimento co-op.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Semana 3</div>
+      <div class="timeline-title">Combate e sistemas especiais</div>
+      <div class="timeline-desc">BattleScene com BattleSystem (turno por Véu). Mecânicas únicas: absorção (Metamorfo), crafting (Duelista), mantras+caminhos (Xamã), maldições+burst (Voraz). ComboSystem 2P.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Semana 4</div>
+      <div class="timeline-title">Árvore de habilidades + diálogos</div>
+      <div class="timeline-desc">SkillTreeScene + SkillTreeUI (nós, prerequisitos, nomes por idioma). DialogSystem com bips por personagem. Storytelling integrado aos mapas via NPCs e triggers.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-week">Semana 5</div>
+      <div class="timeline-title">Áudio, score e polish</div>
+      <div class="timeline-desc">AudioSystem: trilhas por cena com fade, SFX, bips. ScoreSystem com multiplicadores. GameOverScene e EndingScene. Balanceamento, testes no Pi 4, otimização de performance.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 08 TIME ══ -->
+<div class="section" id="time">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>Divisão do Time</h2>
+  </div>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar" style="background:#1a2535; color: var(--teal);">P1</div>
+      <div class="team-name">Lead Dev</div>
+      <div class="team-role">main.js, cenas base, Phaser config, setup Pi</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background:#251a35; color: var(--accent2);">P2</div>
+      <div class="team-name">Gameplay Dev</div>
+      <div class="team-role">BattleSystem, classes dos personagens, sistemas especiais</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background:#251a1a; color: var(--red);">P3</div>
+      <div class="team-name">UI & Arte</div>
+      <div class="team-role">HUD, SkillTreeUI, DialogBox, sprites LPC, tilesets</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background:#1a2520; color: var(--green);">P4</div>
+      <div class="team-name">Narrativa & Data</div>
+      <div class="team-role">dialogue.json, mapas Tiled, lore em jogo, NPCs</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background:#25211a; color: var(--amber);">P5</div>
+      <div class="team-name">Áudio & QA</div>
+      <div class="team-role">AudioSystem, Suno prompts, SFX, testes, balanceamento</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 09 PROMPT ══ -->
+<div class="section" id="prompt">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2>Prompt para IA de Programação</h2>
+  </div>
+  <p>Use este prompt com <strong>Gemini 2.5 Pro</strong>, <strong>Claude</strong> ou <strong>GPT-4.1</strong>. Cole o prompt completo antes de pedir código específico.</p>
+
+  <div class="prompt-box">
+    <div class="prompt-header">PROMPT DE CONTEXTO — Véu Partido</div>
+    <div class="prompt-body">
+<strong>Você é um desenvolvedor especialista em Phaser.js v3 e jogos 2D para hardware limitado (Raspberry Pi 4, 8GB RAM).</strong>
+
+Estou desenvolvendo um RPG 2D chamado <em>Véu Partido</em>. Aqui está o contexto técnico e de design completo:
+
+---
+
+<strong>STACK TÉCNICA</strong>
+- Motor: Phaser.js v3.60+
+- Bundler: Vite (para compatibilidade com Pi 4)
+- Runtime: Chromium/Electron no Raspberry Pi 4 Model B (8GB)
+- Sprites: Universal LPC Spritesheet Generator (formato padrão LPC, 64x64 por frame)
+- Áudio: .ogg, Phaser.Sound.Manager
+- Mapas: Tiled Map Editor, exportados em .json
+- Todos os assets de áudio em formato .ogg (leve para Pi)
+- Sem bibliotecas externas além de Phaser, Tiled e assets LPC
+
+<strong>REQUISITOS OBRIGATÓRIOS</strong>
+- 2 jogadores simultâneos — NUNCA single player. P1 e P2 jogam na mesma tela (teclado dividido ou 2 gamepads).
+- Jogo 2D, top-down na exploração, turn-based no combate.
+- Sistema de score e tela de game over / ending.
+- Storytelling integrado via sistema de diálogo estilo Undertale (bips por personagem).
+
+<strong>SISTEMA DE STATS — OS CINCO VESTÍGIOS</strong>
+Os stats se chamam Vestígios. Cada um tem um nome lore e um equivalente mecânico:
+- F — Fratura (≡ Força): dano e penetração
+- P — Pulso (≡ Vitalidade): vida, colapso ao zerar
+- E — Eco (≡ Mana): combustível de habilidades
+- V — Véu (≡ Velocidade): ordem de turno e esquivas
+- L — Limiar (≡ Mentalidade): estabilidade de habilidades especiais
+
+Nas classes tecnológicas (Metamorfo, Duelista), a árvore de habilidades usa nomenclatura alemã para os ramos.
+Nas classes mágicas (Xamã, Voraz), usa nomenclatura russa.
+
+<strong>AS 4 CLASSES (obrigatoriamente 2 jogadores escolhem qualquer combinação)</strong>
+
+<em>METAMORFO (Caio) — Tecnológico</em>
+- Após derrotar inimigo, pode "Absorver Essência" (custo: Eco)
+- Cada essência concede um traço passivo do inimigo derrotado
+- Slots de essência limitados (1 base, expande pela árvore)
+- Com essências suficientes, combina traços em habilidades únicas
+- Árvore: ramos em alemão (Bruch-Linie, Puls-Kern, Echo-Spur, Schleier-Schritt, Schwelle-Form)
+
+<em>DUELISTA (Rael) — Tecnológico</em>
+- Atirador de longa distância
+- Mecânica de crafting instantâneo: pega materiais do chão, a qualidade determina a arma
+- Qualidades: F (lixo), D, C, B, A, S (raro)
+- Arma criada dura até o fim da batalha atual
+- Árvore: ramos em alemão (Bruch-Schuss, Puls-Reflex, Echo-Bau, Schleier-Zug, Schwelle-Sinn)
+
+<em>XAMÃ (Sura) — Mágico</em>
+- Lança Mantras (maldições contra a realidade), custos em Eco
+- Três caminhos: Depredação (físico/mental), Desastre (elemental), Místico (arcano/necromante)
+- Usar caminhos diferentes aumenta "Dissonância" — debuff/buff dependendo do Limiar
+- Árvore: ramos em russo (Разлом-Слово, Пульс-Щит, Эхо-Закон, Покров-Путь, Порог-Разум)
+
+<em>VORAZ (Dren) — Mágico</em>
+- Absorve maldições de inimigos/NPCs, altera stats físicos
+- Exemplos: Fome (+Véu, −Pulso/turno), Preguiça (−Véu, −custo Eco)
+- Pilha até 3 maldições simultâneas
+- Mecânica de Revenge Counter: acumula dano recebido, libera em burst
+- Tipo de burst varia conforme maldições ativas
+- Árvore: ramos em russo (Разлом-Гнев, Пульс-Дрен, Эхо-Поток, Покров-Голод, Порог-Хаос)
+
+<strong>SISTEMA DE COMBOS 2P</strong>
+Quando P1 e P2 usam habilidades específicas em sequência, o ComboSystem detecta e aplica efeito especial.
+Exemplos:
+- Sura (mantra Místico) + Dren com maldição ativa → "Eco Compartilhado" (maldição vira combustível)
+- Caio (essência voadora absorvida) + Sura (Покров) → "Sombra de Véu" (Caio intangível por 1 turno)
+O ComboSystem deve verificar a janela de 1 turno para combo.
+
+<strong>ÁRVORE DE HABILIDADES</strong>
+- Estrutura nodal (não linear) — inspirada em Deepwoken mas como árvore, não cartas
+- 5 ramos por personagem (um por Vestígio)
+- Nós têm prerequisitos (nó pai deve estar desbloqueado)
+- Pontos ganhos ao subir de nível
+- A SkillTreeUI exibe os nomes no idioma correto para cada classe
+
+<strong>SISTEMA DE ÁUDIO — ESTILO UNDERTALE</strong>
+- Diálogos: cada personagem tem um "blip" único reproduzido a cada letra exibida
+  - Caio: blip_caio.ogg (grave, lento)
+  - Rael: blip_rael.ogg (agudo, rápido)
+  - Sura: blip_sura.ogg (médio, firme)
+  - Dren: blip_dren.ogg (rouco, médio-grave)
+- Músicas por cena em .ogg com fade in/out
+- SFX específicos para cada mecânica
+
+<strong>ESTRUTURA DE CENAS (em ordem)</strong>
+BootScene → PreloadScene → TitleScene → MenuScene → CharSelectScene → ExploreScene ↔ BattleScene → (GameOverScene | EndingScene)
+O DialogScene e SkillTreeScene rodam como overlays sobre as cenas ativas.
+
+<strong>PERFORMANCE NO RASPBERRY PI 4</strong>
+- Resolução alvo: 1280x720 ou 960x540 (definir em constants.js)
+- Usar Phaser.Scale.FIT com letterbox
+- Evitar shaders complexos e filtros WebGL pesados
+- Preferir spritesheets a imagens individuais
+- Chunks de tilemap: não carregar mapa inteiro, usar câmera com bounds
+- Música: volume ≤ 0.7, não sobrepor mais de 2 sons simultâneos
+
+<strong>CONVENÇÕES DE CÓDIGO</strong>
+- ES6 modules (import/export)
+- Comentários em português quando explicar lógica de jogo
+- Dados de jogo em JSON separados (nunca hardcoded na lógica)
+- Cada sistema é uma classe JS com métodos update(delta) quando aplicável
+- Eventos Phaser para comunicação entre sistemas (não chamadas diretas quando possível)
+
+---
+
+Quando eu pedir código, siga esta estrutura. Pergunte se precisar de esclarecimentos antes de gerar.
+    </div>
+  </div>
+
+  <h3>Como usar o prompt</h3>
+  <p>1. Cole o prompt acima inteiro em uma nova conversa com a IA.</p>
+  <p>2. Em seguida, peça implementações específicas como: <strong>"Implemente o BattleSystem.js completo com ordem de turno por Véu e menu de ações para 2 jogadores"</strong> ou <strong>"Crie o CurseSystem.js com a pilha de maldições do Voraz, incluindo Fome e Preguiça"</strong>.</p>
+  <p>3. Para a SkillTreeUI, especifique qual personagem quer primeiro e a IA usará os nomes corretos no idioma certo.</p>
+  <p style="color: var(--amber); font-size: 13px; margin-top: 12px;">💡 <strong>Recomendação de IA:</strong> Gemini 2.5 Pro (janela longa, bom em Phaser.js) ou Claude Sonnet (raciocínio estruturado). Para código de battle system complexo, prefira Claude. Para geração de dados JSON em massa, prefira Gemini.</p>
+
+</div>
+
+<div class="divider"></div>
+<p style="text-align:center; font-family: var(--mono); font-size:11px; color: var(--border2); letter-spacing: 2px;">VÉU PARTIDO · GDD v1.0 · 5 pessoas · Phaser.js · Raspberry Pi 4</p>
+
+</body>
+</html>
