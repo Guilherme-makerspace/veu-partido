@@ -1,8 +1,0 @@
-uploads = []
-generated = []
-
-[[outputs]]
-id = "-Is1FqgL5zodbYe3SlD9w"
-uri = "file://veu-partido-manifest.txt"
-type = "text"
-title = "Véu Partido — Lista de todos os 39 arquivos"

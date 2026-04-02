@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Véu Partido</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050510;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #game-container canvas {
+      display: block;
+      image-rendering: auto;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #050510;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    #loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-title {
+      font-size: 32px;
+      color: #7744cc;
+      font-weight: bold;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px #4400aa;
+      margin-bottom: 16px;
+    }
+
+    .loading-sub {
+      font-size: 13px;
+      color: #443366;
+      margin-bottom: 32px;
+    }
+
+    .loading-bar-bg {
+      width: 300px;
+      height: 8px;
+      background: #221133;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .loading-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5533aa, #aa44ff);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.2s ease;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .version-tag {
+      position: fixed;
+      bottom: 8px;
+      right: 12px;
+      font-size: 10px;
+      color: #221133;
+      z-index: 9998;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="loading-title">VÉU PARTIDO</div>
+    <div class="loading-sub">O Véu rasgou. O mundo se desfaz.</div>
+    <div class="loading-bar-bg">
+      <div class="loading-bar-fill" id="loading-fill"></div>
+    </div>
+  </div>
+
+  <div id="game-container"></div>
+
+  <div class="version-tag">MVP v0.1 — 2 Jogadores</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.87.0/dist/phaser.min.js"></script>
+
+  <script type="module">
+    const overlay = document.getElementById('loading-overlay');
+    const fill    = document.getElementById('loading-fill');
+
+    let prog = 0;
+    const interval = setInterval(() => {
+      prog = Math.min(prog + Math.random() * 12, 92);
+      fill.style.width = prog + '%';
+    }, 100);
+
+    import('./src/main.js').then(() => {
+      clearInterval(interval);
+      fill.style.width = '100%';
+      setTimeout(() => overlay.classList.add('hidden'), 400);
+    }).catch(err => {
+      console.error('Erro ao carregar o jogo:', err);
+      const sub = document.querySelector('.loading-sub');
+      if (sub) sub.textContent = 'Erro ao carregar. Verifique o console.';
+    });
+  </script>
+</body>
+</html>
