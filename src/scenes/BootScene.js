@@ -36,6 +36,18 @@ export class BootScene extends Phaser.Scene {
       barFill.fillRoundedRect(w / 2 - 150, h / 2 + 50, Math.floor(300 * value), 12, 4);
       loading.setText(`Carregando... ${Math.floor(value * 100)}%`);
     });
+
+    // === CARREGAMENTO DOS FUNDOS ===
+    // (Ajuste o caminho/nome .png ou .jpg se os seus estiverem diferentes)
+    this.load.image('cidade_destruida_bg', 'assets/images/backgrounds/cidade_destruida.png');
+    this.load.image('esgoto_limpo_bg', 'assets/images/backgrounds/esgoto_limpo.png');
+    this.load.image('gruta_gelada_bg', 'assets/images/backgrounds/gruta_gelada.png');
+
+    // === CARREGAMENTO DO SPRITE DO PERSONAGEM ===
+    this.load.spritesheet('dit_sprite', 'assets/images/characters/dit.png', { 
+        frameWidth: 64, 
+        frameHeight: 64 
+    });
   }
 
   create() {

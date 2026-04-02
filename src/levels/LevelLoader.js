@@ -134,28 +134,52 @@ export class LevelLoader {
     this._decorations.forEach(d => d.destroy && d.destroy());
     this._decorations = [];
 
-    const { bgColors } = levelData;
+    const { bgColors, bgImage } = levelData;
+
+    // === NOVO CÓDIGO DA IMAGEM DE FUNDO (Isso você já fez e funcionou!) ===
+    // Verifica se a textura da imagem existe. Se existir, usa a imagem.
+    if (bgImage && this.scene.textures.exists(bgImage)) {
+      // Adiciona a imagem no fundo (x: 0, y: 0) e define a origem no canto superior esquerdo
+      const bg = this.scene.add.image(0, 0, bgImage).setOrigin(0, 0);
+
+      // Ajuste o tamanho da imagem para cobrir a tela inteira (ajuste para o tamanho do seu canvas)
+      bg.setDisplaySize(1280, 720);
+
+      bg.setDepth(0); // Depth 0 para ficar atrás de tudo
+      this._decorations.push(bg);
+    } else {
+      // === SE NÃO ACHAR A IMAGEM, MANTÉM O CÓDIGO ANTIGO DO RETÂNGULO COMO BACKFALL ===
+      console.warn(`Imagem de fundo '${bgImage}' não encontrada. Usando cores sólidas.`);
+      const bg = this.scene.add.graphics();
+      bg.fillStyle(bgColors.sky, 1);
+      bg.fillRect(0, 0, 1280, 500);
+      bg.setDepth(-1); // Depth -1 para ficar atrás da imagem de fundo real, se houver
+      this._decorations.push(bg);
+    }
+
+    // === AQUI ESTÁ O QUE VOCÊ PRECISA REMOVER OU COMENTAR ===
+
+    /* --- REMOVA OU COMENTE ESTE BLOCO DO CÉU DESENHADO (CINZA CLARO) ---
     const bg = this.scene.add.graphics();
     bg.fillStyle(bgColors.sky, 1);
     bg.fillRect(0, 0, 1280, 500);
+    this._decorations.push(bg);
+    bg.setDepth(0);
+    */
 
+    /* --- REMOVA OU COMENTE ESTE BLOCO DO CHÃO DESENHADO (MARROM ESCURO) ---
     const ground = this.scene.add.graphics();
     ground.fillStyle(bgColors.ground, 1);
     ground.fillRect(0, 500, 1280, 180);
-
-    const floor = this.scene.add.graphics();
-    floor.fillStyle(bgColors.floor, 1);
-    floor.fillRect(0, 495, 1280, 20);
-    floor.fillStyle(bgColors.floor - 0x101010, 1);
-    floor.fillRect(0, 605, 1280, 20);
-
-    this._decorations.push(bg, ground, floor);
-    bg.setDepth(0);
+    this._decorations.push(ground);
     ground.setDepth(1);
-    floor.setDepth(2);
+    */
 
-    const details = levelData.id;
-    this._addLevelDecorations(details, levelData.bgColors);
+
+
+    // === REMOÇÃO DOS PRÉDIOS FLUTUANTES E DECORAÇÕES ESPECÍFICAS ===
+    // const details = levelData.id;                          // <--- REMOVA OU COMENTE ESTA LINHA
+    // this._addLevelDecorations(details, levelData.bgColors); // <--- REMOVA OU COMENTE ESTA LINHA
   }
 
   _addLevelDecorations(levelId, colors) {

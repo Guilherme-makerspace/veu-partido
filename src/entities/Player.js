@@ -12,6 +12,9 @@ export class Player {
     this.color = config.color || 0xffffff;
     this.accentColor = config.accentColor || 0xaaaaaa;
 
+    // Sprite Key padrão (se o player 2 não tiver uma, ele usa a do Dit por enquanto)
+    this.spriteKey = config.spriteKey || 'dit_sprite'; 
+
     this.x = x;
     this.y = y;
     this.vx = 0;
@@ -50,6 +53,7 @@ export class Player {
     this._nameText = null;
     this._attackGfx = null;
     this._statusEffects = [];
+    this.sprite = null;
 
     this._buildGraphics();
   }
@@ -62,7 +66,32 @@ export class Player {
 
   _buildGraphics() {
     this._gfx = this.scene.add.graphics();
-    this._nameText = this.scene.add.text(this.x, this.y - 56, this.name, {
+    
+    // === CRIANDO O SPRITE ANIMADO ===
+    this.sprite = this.scene.add.sprite(this.x, this.y - 20, this.spriteKey).setDepth(10);
+    this.sprite.setScale(1.5); // Aumenta o tamanho pra não ficar um anão
+    
+    if (!this.scene.anims.exists(`${this.spriteKey}_walk`)) {
+      // Animação de Andar (frames 143 a 151 no padrão LPC)
+      this.scene.anims.create({
+        key: `${this.spriteKey}_walk`,
+        frames: this.scene.anims.generateFrameNumbers(this.spriteKey, { start: 143, end: 151 }),
+        frameRate: 10,
+        repeat: -1
+      });
+
+      // Animação Parado (Idle)
+      this.scene.anims.create({
+        key: `${this.spriteKey}_idle`,
+        frames: [{ key: this.spriteKey, frame: 143 }],
+        frameRate: 1
+      });
+    }
+
+    this.sprite.play(`${this.spriteKey}_idle`);
+    // ===================================
+
+    this._nameText = this.scene.add.text(this.x, this.y - 65, this.name, {
       fontSize: '12px',
       color: '#ffffff',
       stroke: '#000000',
@@ -78,24 +107,9 @@ export class Player {
     g.setDepth(10);
 
     const alpha = this.isInvincible() ? 0.5 : 1;
-
-    g.fillStyle(this.color, alpha);
-    g.fillRect(this.x - 16, this.y - 44, 32, 44);
-
-    g.fillStyle(this.accentColor, alpha);
-    g.fillCircle(this.x, this.y - 54, 14);
-
-    if (this.facing > 0) {
-      g.fillStyle(0xffffff, alpha);
-      g.fillCircle(this.x + 5, this.y - 56, 3);
-      g.fillStyle(0x000000, 1);
-      g.fillCircle(this.x + 6, this.y - 56, 1.5);
-    } else {
-      g.fillStyle(0xffffff, alpha);
-      g.fillCircle(this.x - 5, this.y - 56, 3);
-      g.fillStyle(0x000000, 1);
-      g.fillCircle(this.x - 6, this.y - 56, 1.5);
-    }
+    
+    // Piscar o sprite quando toma dano
+    if (this.sprite) this.sprite.setAlpha(alpha);
 
     const classColors = {
       metamorfo: 0x7c4dff,
@@ -104,11 +118,13 @@ export class Player {
       voraz:     0xf44336,
     };
     const emblemColor = classColors[this.characterClass] || 0xffffff;
+    
+    // Desenha a bolinha indicando a classe em cima da cabeça
     g.fillStyle(emblemColor, alpha);
-    g.fillCircle(this.x, this.y - 30, 6);
+    g.fillCircle(this.x, this.y - 50, 6);
 
     if (this._nameText) {
-      this._nameText.setPosition(this.x, this.y - 74);
+      this._nameText.setPosition(this.x, this.y - 65);
     }
   }
 
@@ -152,6 +168,23 @@ export class Player {
     const dt = delta / 1000;
     this.x += this.vx * dt;
     this.y += this.vy * dt;
+
+    // === GERENCIANDO A ANIMAÇÃO ===
+    if (this.sprite) {
+      this.sprite.setPosition(this.x, this.y - 20); 
+      this.sprite.setFlipX(this.facing < 0);        
+
+      if ((Math.abs(this.vx) > 5 || Math.abs(this.vy) > 5) && !this.isAttacking && !this.isUsingSkill) {
+        if (this.sprite.anims.currentAnim?.key !== `${this.spriteKey}_walk`) {
+          this.sprite.play(`${this.spriteKey}_walk`);
+        }
+      } else {
+        if (!this.isAttacking && !this.isUsingSkill && this.sprite.anims.currentAnim?.key !== `${this.spriteKey}_idle`) {
+          this.sprite.play(`${this.spriteKey}_idle`);
+        }
+      }
+    }
+    // ==============================
 
     if (this.isKnockback) {
       this.vx *= 0.85;
@@ -262,6 +295,16 @@ export class Player {
     this.isDead = true;
     this.hp = 0;
 
+    // Remove o sprite com estilo quando morre
+    if (this.sprite) {
+      this.scene.tweens.add({
+        targets: this.sprite,
+        alpha: 0,
+        duration: 600,
+        onComplete: () => { this.sprite && this.sprite.destroy(); }
+      });
+    }
+
     if (this._gfx) {
       this.scene.tweens.add({
         targets: this._gfx,
@@ -288,6 +331,7 @@ export class Player {
   }
 
   destroy() {
+    this.sprite && this.sprite.destroy();
     this._gfx && this._gfx.destroy();
     this._nameText && this._nameText.destroy();
     this._attackGfx && this._attackGfx.destroy();
