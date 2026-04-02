@@ -232,6 +232,7 @@ export class Player {
   performAttack() {
     this.isAttacking = true;
     this.attackCooldown = this.scene.time.now + this.attackCooldownMax;
+    this.invincibleUntil = this.scene.time.now + 150;
 
     const attackGfx = this.scene.add.graphics();
     attackGfx.fillStyle(0xffffff, 0.8);
@@ -257,6 +258,10 @@ export class Player {
     const finalAmount = Math.max(1, amount);
     this.hp = Math.max(0, this.hp - finalAmount);
     this.invincibleUntil = this.scene.time.now + 600;
+
+    const dir = this.x > attacker.x ? 1 : -1;
+    this.vx = dir * 120;
+    this.isKnockback = true;
 
     this.scene.cameras.main.shake(80, 0.005);
     bus.emit('playerDamaged', { player: this, amount: finalAmount, hp: this.hp });
