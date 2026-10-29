@@ -1,0 +1,125 @@
+[
+  {
+    "id": 1,
+    "name": "Impacto Ressonante",
+    "tier": "comum",
+    "requirements": { "fratura": 3 },
+    "trigger": "on_heavy_attack",
+    "effects": [
+      { "type": "spawn_shockwave", "rangeX": 120, "damageRatio": 0.30 }
+    ],
+    "description": "Onda frontal em ataques pesados (120px, 30% dano)."
+  },
+  {
+    "id": 3,
+    "name": "Passo Cortante",
+    "tier": "comum",
+    "requirements": { "veu": 3 },
+    "trigger": "on_dash_contact",
+    "effects": [
+      { "type": "contact_damage", "scaleStat": "fratura", "multiplier": 4.0 }
+    ],
+    "description": "O Dash agora causa dano se o jogador atravessar a hitbox do inimigo no Eixo X (Escala com FRA)."
+  },
+  {
+    "id": 9,
+    "name": "Eco de Impacto",
+    "tier": "comum",
+    "requirements": { "eco": 3 },
+    "trigger": "on_hit",
+    "effects": [
+      { "type": "restore_resource", "resource": "eco", "amount": 2 }
+    ],
+    "description": "Ataques básicos restauram 2 de Eco."
+  },
+  {
+    "id": 14,
+    "name": "Fratura Exposta",
+    "tier": "comum",
+    "requirements": { "fratura": 5 },
+    "trigger": "on_calculate_damage",
+    "conditions": { "targetHasState": "stunned" },
+    "modifiers": [
+      { "stat": "damageMultiplier", "operation": "add", "value": 0.05 }
+    ],
+    "description": "Ataques leves causam 5% mais dano a inimigos atordoados."
+  },
+  {
+    "id": 21,
+    "name": "Estilhaço Expansivo",
+    "tier": "incomum",
+    "requirements": { "fratura": 7 },
+    "trigger": "on_kill_heavy",
+    "effects": [
+      { "type": "aoe_explosion", "radius": 90, "damageType": "physical_blunt", "scaleStat": "fratura" }
+    ],
+    "description": "Inimigos mortos por peso explodem (Dano FRA)."
+  },
+  {
+    "id": 36,
+    "name": "Fúria do Marcado",
+    "tier": "incomum",
+    "requirements": { "fratura": 8 },
+    "trigger": "on_calculate_damage",
+    "modifiers": [
+      { "stat": "dynamicScalingByLostHp", "maxValue": 0.20 }
+    ],
+    "description": "Dano aumenta conforme a vida diminui (até 20%)."
+  },
+  {
+    "id": 45,
+    "name": "Punho de Urânio",
+    "tier": "raro",
+    "requirements": { "fratura": 14 },
+    "trigger": "on_calculate_damage",
+    "conditions": { "isHeavy": true },
+    "modifiers": [
+      { "stat": "armorPenetration", "operation": "add", "value": 0.30 }
+    ],
+    "description": "Ataques pesados ignoram 30% da armadura física."
+  },
+  {
+    "id": 50,
+    "name": "Vínculo Terminal",
+    "tier": "epico",
+    "requirements": { "pulso": 17, "limiar": 15 },
+    "trigger": "on_calculate_damage",
+    "conditions": { "attackerHpBelow": 0.20 },
+    "modifiers": [
+      { "stat": "damageMultiplier", "operation": "add", "value": 1.00 }
+    ],
+    "description": "Dano +100% para ambos se estiverem em Low HP."
+  },
+  {
+    "id": 51,
+    "name": "Eco Primordial",
+    "tier": "epico",
+    "requirements": { "eco": 16, "limiar": 16 },
+    "trigger": "on_calculate_damage",
+    "conditions": { "isMagic": true },
+    "modifiers": [
+      { "stat": "magicPenetration", "operation": "add", "value": 0.50 }
+    ],
+    "description": "Habilidades ignoram 50% das resistências inimigas."
+  },
+  {
+    "id": 58,
+    "name": "Véu Absoluto",
+    "tier": "lendario",
+    "requirements": { "veu": 20, "limiar": 20 },
+    "trigger": "on_perfect_dash_streak",
+    "conditions": { "streakCount": 3 },
+    "behaviorHook": "modo_deus_invulneravel",
+    "description": "3 esquivas perfeitas = 5s de modo Deus (Invulnerável)."
+  },
+  {
+    "id": 59,
+    "name": "Coração do Estilhaço",
+    "tier": "lendario",
+    "requirements": { "pulso": 20, "fratura": 18 },
+    "trigger": "on_fatal_damage",
+    "behaviorHook": "espectro_imortal_8s",
+    "description": "Ao morrer, vira um espectro imortal por 8s."
+  }
+]
+

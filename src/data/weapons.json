@@ -1,0 +1,67 @@
+[
+  {
+    "id": "w17_machado_batalha",
+    "name": "Machado de Batalha de Dren",
+    "category": "martelos",
+    "rarity": "incomum",
+    "damageComponents": [
+      { "type": "physical_slash", "baseAmount": 14, "penetrationRatio": 0.15 },
+      { "type": "physical_blunt", "baseAmount": 12, "penetrationRatio": 0.25 }
+    ],
+    "embeddedTalentIds": [17, 20],
+    "specialStatus": "rachadura",
+    "description": "Combina corte brutal e esmagamento contundente. Aplica dano de Slash + Blunt simultâneo."
+  },
+  {
+    "id": "d03_sniper_quartzo",
+    "name": "Sniper de Quartzo Lapidado de Dullant",
+    "category": "construtos",
+    "rarity": "raro",
+    "damageComponents": [
+      { "type": "physical_pierce", "baseAmount": 28, "penetrationRatio": 0.65 }
+    ],
+    "embeddedTalentIds": [45],
+    "specialStatus": "fragilidade",
+    "description": "Disparo perfurante de longa distância. Perfuração de armadura pesada (65%)."
+  },
+  {
+    "id": "d14_canhao_uranio",
+    "name": "Canhão de Fissão de Urânio",
+    "category": "construtos",
+    "rarity": "epico",
+    "damageComponents": [
+      { "type": "physical_pierce", "baseAmount": 20, "penetrationRatio": 0.50 },
+      { "type": "fissao_decay", "baseAmount": 15, "penetrationRatio": 0.40 },
+      { "type": "radiacao_dot", "baseAmount": 8, "penetrationRatio": 0.30 }
+    ],
+    "embeddedTalentIds": [21, 32],
+    "specialStatus": "decaimento_fissao",
+    "description": "Projétil de urânio enriquecido. Causa decaimento físico contínuo por radiação e fissão."
+  },
+  {
+    "id": "w47_xacran_vidro",
+    "name": "Xacran da Maldição de Duja",
+    "category": "magicas",
+    "rarity": "incomum",
+    "damageComponents": [
+      { "type": "maldicao_status", "baseAmount": 18, "penetrationRatio": 0.75 }
+    ],
+    "embeddedTalentIds": [4],
+    "specialStatus": "maldicao_visceral",
+    "description": "Disco giratório que entoa cantos de agonia. Causa dano de Maldição com 75% de penetração mágica e acúmulo de stacks."
+  },
+  {
+    "id": "w54_livro_sangue",
+    "name": "Grimório da Ruína Visceral",
+    "category": "magicas",
+    "rarity": "epico",
+    "damageComponents": [
+      { "type": "maldicao_status", "baseAmount": 32, "penetrationRatio": 0.85 },
+      { "type": "entropia_pura", "baseAmount": 12, "penetrationRatio": 0.90 }
+    ],
+    "embeddedTalentIds": [51, 56],
+    "specialStatus": "maldicao_visceral",
+    "description": "Dobra a realidade psíquica do adversário com 85% a 90% de perfuração de resistência mental."
+  }
+]
+

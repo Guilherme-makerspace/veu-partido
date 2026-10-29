@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>O Véu Partido - 2.5D Hardcore ARPG</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: #0b0b12;
+        color: #d1d5db;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+      #game-container {
+        position: relative;
+        box-shadow: 0 0 30px rgba(96, 40, 160, 0.45);
+        border: 2px solid #3b2064;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #000;
+      }
+      #controls-hint {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #9ca3af;
+        text-align: center;
+      }
+      #controls-hint span {
+        color: #c084fc;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <div id="controls-hint">
+      Movimento: <span>Setas / WASD</span> (2.5D X e Y) | Ataque Leve: <span>J / Z</span> | Ataque Pesado: <span>K / X</span> | Habilidade: <span>L / C</span> | Dash: <span>Espaço</span> | Defesa/Parry: <span>Shift</span> | Trocar Personagem: <span>1, 2, 3, 4</span> | Ação de Loot: <span>E (Equipar/Coletar), F (Fragmentar), R (Especial de Classe)</span>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+
