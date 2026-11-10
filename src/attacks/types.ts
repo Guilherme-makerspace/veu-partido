@@ -1,4 +1,5 @@
-import { BaseStats, StatusEffectType, WeaponItem } from '../types';
+import { BaseStats, StatusEffectType, WeaponItem, CharacterPathId } from '../types';
+import { GreyHealthState, PathStatusInstance, PathSpecificStatusType } from '../types/damageTypes';
 
 export interface CombatEntity {
   id: string;
@@ -18,6 +19,16 @@ export interface CombatEntity {
   isDodging: boolean;
   isParrying: boolean;
   isStunned: boolean;
+  statusEffects: any[];
+  pathStatuses?: PathStatusInstance[];
+  greyHealth?: GreyHealthState;
+  antiHealActive?: boolean;
+  isInvulnerable?: boolean;
+  currentPath?: CharacterPathId;
+  currentSubPathId?: string;
+  damageDealtMultiplier?: number;
+  isSilenced?: boolean;
+  speedMultiplier?: number;
   takeDamage: (amount: number, isCritical: boolean, appliedEffects: StatusEffectType[]) => void;
 }
 
@@ -26,6 +37,8 @@ export interface AttackContext {
   targets: CombatEntity[];
   scene: any;
   isHeavy?: boolean;
+  /** Sub-habilidade ativa (quando o ataque é disparado por um sub-caminho) */
+  subSkillId?: string;
 }
 
 export interface AttackResult {
@@ -34,6 +47,10 @@ export interface AttackResult {
   energySpent: number;
   animationTriggered: string;
   statusApplied: StatusEffectType[];
+  /** Status de caminho aplicados pelo golpe (Podridão, Chamas Negras, etc.) */
+  pathStatusesApplied?: PathSpecificStatusType[];
+  /** Vida Cinza gerada (exclusivo Dren) */
+  greyHealthDealt?: number;
 }
 
 export type AttackFunction = (ctx: AttackContext) => AttackResult;

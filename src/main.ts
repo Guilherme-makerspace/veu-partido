@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 import { MainArenaScene } from './scenes/MainArenaScene';
 
+// Expõe o Phaser globalmente (QA headless e depuração no console do navegador)
+(window as any).Phaser = Phaser;
+
 /**
  * Ponto de Entrada de O Véu Partido (2.5D Hardcore ARPG)
  * Configurado conforme Módulo 8 (Manual Técnico de Performance e Execução):
@@ -28,5 +31,27 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [MainArenaScene],
 };
 
-new Phaser.Game(config);
+/**
+ * Boot com carregamento resiliente de assets:
+ * tenta novamente caso o primeiro carregamento do spritesheet falhe em
+ * condições de rede/GPU instáveis (ambiente headless, conexões lentas).
+ */
+export function bootGame(attempt: number = 1): Phaser.Game {
+  const game = new Phaser.Game(config);
+  game.events.once('ready', () => {
+    const scene = game.scene.getScene('MainArenaScene');
+    const probe = window.setTimeout(() => {
+      const sprite = (scene as any)?.playerSprite;
+      if (!sprite && attempt < 3) {
+        game.destroy(true);
+        window.clearTimeout(probe);
+        bootGame(attempt + 1);
+      }
+    }, 4000);
+    game.events.once('shutdown', () => window.clearTimeout(probe));
+  });
+  (window as any).__veuGame = game;
+  return game;
+}
 
+bootGame();

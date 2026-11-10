@@ -22,6 +22,8 @@ export const CHARACTERS_DATA: Record<CharacterId, CharacterData> = {
     spriteKey: 'dit',
     sheetCols: 13,
     initialWeaponId: 'w17_machado_batalha',
+    availablePaths: ['dit_metamorfo_multiplo', 'dit_metamorfo_evolutivo'],
+    elementalAffinity: ['osseous_puncture', 'frost_bite', 'predatory_claw'],
   },
   dullant: {
     id: 'dullant',
@@ -40,6 +42,8 @@ export const CHARACTERS_DATA: Record<CharacterId, CharacterData> = {
     spriteKey: 'dullant',
     sheetCols: 18,
     initialWeaponId: 'd03_sniper_quartzo',
+    availablePaths: ['dullant_duelista_eco', 'dullant_duelista_fratura'],
+    elementalAffinity: ['crystallite_resonance', 'ballistic_pierce', 'fissao_decay'],
   },
   dren: {
     id: 'dren',
@@ -58,6 +62,8 @@ export const CHARACTERS_DATA: Record<CharacterId, CharacterData> = {
     spriteKey: 'dren',
     sheetCols: 18,
     initialWeaponId: 'w26_grande_malho_pedra',
+    availablePaths: ['dren_corcovado', 'dren_espelhado'],
+    elementalAffinity: ['rot_necrosis', 'physical_cleave', 'tomb_weight'],
   },
   duja: {
     id: 'duja',
@@ -76,6 +82,8 @@ export const CHARACTERS_DATA: Record<CharacterId, CharacterData> = {
     spriteKey: 'suna',
     sheetCols: 24,
     initialWeaponId: 'w47_xacran_vidro',
+    availablePaths: ['duja_maldito', 'duja_imaculado', 'duja_cetico'],
+    elementalAffinity: ['maldicao_status', 'black_flame', 'eco_acoustic'],
   },
 };
 

@@ -1,4 +1,4 @@
-import { ItemRarity, RarityConfig, WeaponCategory, WeaponItem } from '../types';
+import { ItemRarity, RarityConfig, WeaponItem } from '../types';
 
 /**
  * Tabela de Raridades e Multiplicadores conforme Módulos 5.1 e 14.2
@@ -109,7 +109,7 @@ export const WEAPONS_DATABASE: WeaponItem[] = [
   { id: 'w60_eco_primordial', name: 'O Eco Primordial', category: 'magicas', rarity: 'lendario', baseDamage: 38, description: 'Dispara feixes de luz que perseguem automaticamente todos os alvos.', weightCategory: 'leve' },
 
   // CATEGORIA 5: O ARSENAL IMPROVISADO DE DULLANT (D01 a D15)
-  { id: 'd01_arco_curto_betula', name: 'Arco de Bétula', category: 'construtos', rarity: 'comum', baseDamage: 12, description: 'Construto rápido moldado com galhos e resina.', materialCost: { material: 'madeira', amount: 2 } },
+  { id: 'd01_arco_curto_betula', name: 'Arco de Bétula', category: 'construtos', rarity: 'comum', baseDamage: 12, description: 'Construto rápido moldado com galhos e resina.', materialCost: { material: 'madeira', amount: 2 }, damageComponents: [{ type: 'ballistic_arrow', baseAmount: 12, penetrationRatio: 0.30, scalingStat: 'fratura' }] },
   { id: 'd02_balista_calcario', name: 'Balista de Calcário', category: 'construtos', rarity: 'incomum', baseDamage: 16, description: 'Projeta estacas de pedra que quebram escudos.', materialCost: { material: 'pedra', amount: 3 } },
   { id: 'd03_sniper_quartzo', name: 'Sniper de Quartzo', category: 'construtos', rarity: 'raro', baseDamage: 24, description: 'Feixe linear concentrado de longa distância.', materialCost: { material: 'cristal', amount: 2 } },
   { id: 'd04_bacamarte_ferro', name: 'Bacamarte de Ferro', category: 'construtos', rarity: 'incomum', baseDamage: 18, description: 'Disparo disperso cônico com alto knockback.', materialCost: { material: 'sucata', amount: 3 } },
@@ -123,7 +123,56 @@ export const WEAPONS_DATABASE: WeaponItem[] = [
   { id: 'd12_besta_chumbo', name: 'Besta de Chumbo Líquido', category: 'construtos', rarity: 'epico', baseDamage: 30, description: 'Reduz a armadura física do inimigo atingido.', materialCost: { material: 'sucata', amount: 4 } },
   { id: 'd13_rifle_silica', name: 'Rifle de Sílica Férrica', category: 'construtos', rarity: 'epico', baseDamage: 31, description: 'Estilhaços incandescentes que queimam o solo.', materialCost: { material: 'cristal', amount: 3 } },
   { id: 'd14_canhao_uranio', name: 'Canhão de Fissão de Urânio', category: 'construtos', rarity: 'epico', baseDamage: 36, description: 'Radiação violenta e dano contínuo.', materialCost: { material: 'uranio', amount: 2 } },
-  { id: 'd15_olho_bon', name: 'O Olho do Bön', category: 'construtos', rarity: 'lendario', baseDamage: 48, description: 'Construto orbital de ferro meteórico e laser contínuo.', materialCost: { material: 'uranio', amount: 3 } },
+  { id: 'd15_olho_bon', name: 'O Olho do Bön', category: 'construtos', rarity: 'lendario', baseDamage: 48, description: 'Construto orbital de ferro meteórico e laser contínuo.', materialCost: { material: 'uranio', amount: 3 }, damageComponents: [{ type: 'crystallite_resonance', baseAmount: 30, penetrationRatio: 0.80, scalingStat: 'eco' }, { type: 'fissao_decay', baseAmount: 18, penetrationRatio: 0.55, scalingStat: 'limiar' }] },
+
+  // ============================================================
+  // CATEGORIA 6: LÂMINAS CURTAS E ADAGAS (A01 a A10) - Foco: Véu / Perfuração
+  // ============================================================
+  { id: 'a01_adaga_osso', name: 'Adaga de Osso', category: 'adagas', rarity: 'comum', baseDamage: 10, description: 'Lâmina lascada de fêmur: rápida, crua e silenciosa.', weightCategory: 'leve', damageTypes: ['rapier_thrust'], penetrationRatio: 0.45 },
+  { id: 'a02_punhal_toxicidade', name: 'Punhal de Mercúrio', category: 'adagas', rarity: 'incomum', baseDamage: 13, description: 'Canaleta interna verte gotas de mercúrio a cada golpe.', weightCategory: 'leve', damageTypes: ['rapier_thrust', 'alchemical_poison'], penetrationRatio: 0.45 },
+  { id: 'a03_estilete_veu', name: 'Estilete do Véu', category: 'adagas', rarity: 'raro', baseDamage: 16, description: 'Críticos ignoram 30% adicionais de armadura.', weightCategory: 'leve', damageTypes: ['rapier_thrust'], penetrationRatio: 0.60 },
+  { id: 'a04_presa_carniceira', name: 'Presa Carniceira', category: 'adagas', rarity: 'raro', baseDamage: 18, description: 'Rouba 8% do dano em vida ao acertar pelas costas.', weightCategory: 'leve', damageTypes: ['predatory_claw'], penetrationRatio: 0.30 },
+  { id: 'a05_faca_serra', name: 'Faca-Serra de Tana', category: 'adagas', rarity: 'epico', baseDamage: 21, description: 'Corte em serra que garante Sangramento e Rachadura.', weightCategory: 'leve', damageTypes: ['physical_slash', 'visceral_rend'], penetrationRatio: 0.25 },
+  { id: 'a06_punhal_prismatico', name: 'Punhal Prismático', category: 'adagas', rarity: 'epico', baseDamage: 20, description: 'Reflete 15% do dano recebido enquanto a lâmina está erguida.', weightCategory: 'leve', damageTypes: ['mirror_shard'], penetrationRatio: 0.55 },
+  { id: 'a07_agulha_gelo', name: 'Agulha de Gelo Negro', category: 'adagas', rarity: 'raro', baseDamage: 17, description: 'Cada acerto empilha Hipotermia.', weightCategory: 'leve', damageTypes: ['frost_bite'], penetrationRatio: 0.40 },
+  { id: 'a08_adaga_alquimica', name: 'Adaga de Reagentes', category: 'adagas', rarity: 'epico', baseDamage: 19, description: 'A lâmina injeta vitríolo: reduz defesa permanentemente.', weightCategory: 'leve', damageTypes: ['alchemical_acid', 'rapier_thrust'], penetrationRatio: 0.50 },
+  { id: 'a09_kris_almas', name: 'Kris das Almas', category: 'adagas', rarity: 'epico', baseDamage: 22, description: 'Acertos acumulam Maldição Visceral no alvo.', weightCategory: 'leve', damageTypes: ['maldicao_status', 'hex_whisper'], penetrationRatio: 0.75 },
+  { id: 'a10_pe_de_cabra', name: 'Espinho Ancestral', category: 'adagas', rarity: 'lendario', baseDamage: 27, description: 'Ignora a guarda e perfura vida cinza, detonando a podridão restante.', weightCategory: 'leve', damageTypes: ['osseous_puncture', 'rot_necrosis'], penetrationRatio: 0.55 },
+
+  // ============================================================
+  // CATEGORIA 7: FOICES E GADANHAS (F01 a F05) - Foco: Corte Amplo
+  // ============================================================
+  { id: 'f01_foice_colheita', name: 'Foice de Colheita', category: 'foices', rarity: 'comum', baseDamage: 16, description: 'Corte largo em arco; atinge todos no mesmo Eixo Y.', weightCategory: 'medio', damageTypes: ['physical_slash', 'polearm_sweep'], penetrationRatio: 0.20 },
+  { id: 'f02_gadanha_ceifadora', name: 'Gadanha Ceifadora', category: 'foices', rarity: 'raro', baseDamage: 24, description: 'Golpes pesados executam alvos com menos de 12% de vida.', weightCategory: 'pesado', damageTypes: ['physical_cleave'], penetrationRatio: 0.25 },
+  { id: 'f03_foice_tumular', name: 'Foice Tumular', category: 'foices', rarity: 'epico', baseDamage: 28, description: 'Converte 40% do dano em Vida Cinza (exclusivo Dren Corcovado).', weightCategory: 'pesado', damageTypes: ['rot_necrosis', 'physical_cleave'], penetrationRatio: 0.30, allowedPaths: ['dren_corcovado'] },
+  { id: 'f04_foice_espectral', name: 'Foice Espectral', category: 'foices', rarity: 'epico', baseDamage: 25, description: 'Atinge inimigos invisíveis e ignora intangibilidade parcial.', weightCategory: 'medio', damageTypes: ['spirit_blight', 'physical_slash'], penetrationRatio: 0.60 },
+  { id: 'f05_foice_ultimo_nicho', name: 'Foice do Último Nicho', category: 'foices', rarity: 'lendario', baseDamage: 34, description: 'Cada abate restaura 1 stack de Coreografia Voraz permanentemente na arena.', weightCategory: 'pesado', damageTypes: ['rot_necrosis', 'tomb_weight'], penetrationRatio: 0.35, allowedPaths: ['dren_corcovado'] },
+
+  // ============================================================
+  // CATEGORIA 8: MANGUais, CORRENTES E ESTRELAS (M01 a M05)
+  // ============================================================
+  { id: 'm01_mangual_ferro', name: 'Mangual de Ferro', category: 'mangual', rarity: 'incomum', baseDamage: 20, description: 'Ignora escudos e aplica Atordoamento em crítico.', weightCategory: 'pesado', damageTypes: ['spike_impale', 'physical_blunt'], penetrationRatio: 0.30 },
+  { id: 'm02_estrela_manha_ritual', name: 'Estrela da Manhã Ritual', category: 'mangual', rarity: 'epico', baseDamage: 29, description: 'Crítico aplica Sangramento e Fragilidade simultaneamente.', weightCategory: 'pesado', damageTypes: ['spike_impale', 'physical_shatter'], penetrationRatio: 0.30 },
+  { id: 'm03_corrente_espinhos', name: 'Corrente de Espinhos', category: 'mangual', rarity: 'raro', baseDamage: 22, description: 'Alcance estendido; puxa o alvo 40px ao acertar.', weightCategory: 'medio', damageTypes: ['spike_impale', 'harpoon_drag'], penetrationRatio: 0.35 },
+  { id: 'm04_mangual_boneco', name: 'Mangual de Osso Esculpido', category: 'mangual', rarity: 'raro', baseDamage: 24, description: 'Cada acerto empilha Peso do Túmulo.', weightCategory: 'pesado', damageTypes: ['physical_blunt', 'tomb_weight'], penetrationRatio: 0.20 },
+  { id: 'm05_estrela_nicho', name: 'Estrela do Nicho', category: 'mangual', rarity: 'lendario', baseDamage: 36, description: 'Ao acertar, converte o golpe em marca de nicho funerário.', weightCategory: 'pesado', damageTypes: ['tomb_weight', 'rot_necrosis'], penetrationRatio: 0.25, allowedPaths: ['dren_corcovado'] },
+
+  // ============================================================
+  // CATEGORIA 9: CHICOTES E LÂMINAS DE VIME (C01 a C04)
+  // ============================================================
+  { id: 'c01_chicote_couro', name: 'Chicote de Couro Trançado', category: 'chicotes', rarity: 'comum', baseDamage: 9, description: 'Multi-acertos rápidos com alcance Y ampliado.', weightCategory: 'leve', damageTypes: ['whip_lash'], penetrationRatio: 0.18 },
+  { id: 'c02_lanca_vime_afiada', name: 'Lâmina de Vime', category: 'chicotes', rarity: 'incomum', baseDamage: 14, description: 'Recupera fôlego 10% mais rápido enquanto equipada.', weightCategory: 'leve', damageTypes: ['whip_lash', 'polearm_sweep'], penetrationRatio: 0.22 },
+  { id: 'c03_chicote_ossos', name: 'Chicote de Vértebras', category: 'chicotes', rarity: 'epico', baseDamage: 20, description: 'Cada estalo acumula Enxerto Ósseo no seu usuário.', weightCategory: 'medio', damageTypes: ['whip_lash', 'osseous_puncture'], penetrationRatio: 0.40, allowedPaths: ['dit_metamorfo_evolutivo'] },
+  { id: 'c04_cordao_ecos', name: 'Cordão de Ecos', category: 'chicotes', rarity: 'raro', baseDamage: 16, description: 'Estalos emitem Som Primordial que ignora 80% de defesa.', weightCategory: 'leve', damageTypes: ['eco_acoustic', 'whip_lash'], penetrationRatio: 0.80 },
+
+  // ============================================================
+  // CATEGORIA 10: ARMAS DE ARREMESSO (T01 a T05)
+  // ============================================================
+  { id: 't01_azagaia', name: 'Azagaia de Caça', category: 'arremesso', rarity: 'comum', baseDamage: 13, description: 'Perfura o alvo e trava 20% da velocidade por 2s.', weightCategory: 'medio', damageTypes: ['ballistic_bolt', 'physical_pierce'], penetrationRatio: 0.40 },
+  { id: 't02_dardo_venenoso', name: 'Dardo Serrilhado', category: 'arremesso', rarity: 'incomum', baseDamage: 11, description: 'Aplica Veneno empilhável a cada arremesso.', weightCategory: 'leve', damageTypes: ['ballistic_bolt', 'alchemical_poison'], penetrationRatio: 0.35 },
+  { id: 't03_funda_calcario', name: 'Funda de Calcário', category: 'arremesso', rarity: 'incomum', baseDamage: 15, description: 'Pedras pesadas: quebra de guarda elevada.', weightCategory: 'medio', damageTypes: ['ballistic_concussive', 'physical_blunt'], penetrationRatio: 0.25 },
+  { id: 't04_azagaia_quimica', name: 'Azagaia Quimérica', category: 'arremesso', rarity: 'raro', baseDamage: 19, description: 'Arremesso híbrido: veneno quimérico + perfuração óssea.', weightCategory: 'medio', damageTypes: ['quimeric_venom', 'osseous_puncture'], penetrationRatio: 0.45, allowedPaths: ['dit_metamorfo_multiplo'] },
+  { id: 't05_dardo_veu', name: 'Dardo do Véu', category: 'arremesso', rarity: 'epico', baseDamage: 23, description: 'Projétil que atravessa o Eixo Y e ignora guarda.', weightCategory: 'leve', damageTypes: ['physical_pierce', 'entropia_pura'], penetrationRatio: 0.80 },
 ];
 
 /**

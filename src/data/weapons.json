@@ -5,12 +5,30 @@
     "category": "martelos",
     "rarity": "incomum",
     "damageComponents": [
-      { "type": "physical_slash", "baseAmount": 14, "penetrationRatio": 0.15 },
-      { "type": "physical_blunt", "baseAmount": 12, "penetrationRatio": 0.25 }
+      {
+        "type": "physical_cleave",
+        "baseAmount": 14,
+        "penetrationRatio": 0.15
+      },
+      {
+        "type": "axe_frenzy",
+        "baseAmount": 12,
+        "penetrationRatio": 0.25
+      }
     ],
-    "embeddedTalentIds": [17, 20],
+    "embeddedTalentIds": [
+      17,
+      20,
+      63
+    ],
     "specialStatus": "rachadura",
-    "description": "Combina corte brutal e esmagamento contundente. Aplica dano de Slash + Blunt simultâneo."
+    "specialPathStatus": "status_podre",
+    "allowedPaths": [
+      "dit_metamorfo_multiplo",
+      "dren_corcovado",
+      "dren_espelhado"
+    ],
+    "description": "Combina corte brutal e fendimento pesado. Aplica dano de Cleave + Fúria de Machado simultâneo e acumula Podridão se empunhado por Dren."
   },
   {
     "id": "d03_sniper_quartzo",
@@ -18,11 +36,28 @@
     "category": "construtos",
     "rarity": "raro",
     "damageComponents": [
-      { "type": "physical_pierce", "baseAmount": 28, "penetrationRatio": 0.65 }
+      {
+        "type": "ballistic_pierce",
+        "baseAmount": 24,
+        "penetrationRatio": 0.65
+      },
+      {
+        "type": "crystallite_resonance",
+        "baseAmount": 6,
+        "penetrationRatio": 0.60
+      }
     ],
-    "embeddedTalentIds": [45],
+    "embeddedTalentIds": [
+      45,
+      64
+    ],
     "specialStatus": "fragilidade",
-    "description": "Disparo perfurante de longa distância. Perfuração de armadura pesada (65%)."
+    "specialPathStatus": "postura_de_atirador",
+    "allowedPaths": [
+      "dullant_duelista_eco",
+      "dullant_duelista_fratura"
+    ],
+    "description": "Disparo perfurante de longa distância. Perfuração de armadura pesada (65%) com faísca de quartzo ressonante."
   },
   {
     "id": "d14_canhao_uranio",
@@ -30,13 +65,34 @@
     "category": "construtos",
     "rarity": "epico",
     "damageComponents": [
-      { "type": "physical_pierce", "baseAmount": 20, "penetrationRatio": 0.50 },
-      { "type": "fissao_decay", "baseAmount": 15, "penetrationRatio": 0.40 },
-      { "type": "radiacao_dot", "baseAmount": 8, "penetrationRatio": 0.30 }
+      {
+        "type": "ballistic_concussive",
+        "baseAmount": 20,
+        "penetrationRatio": 0.50
+      },
+      {
+        "type": "fissao_decay",
+        "baseAmount": 15,
+        "penetrationRatio": 0.40
+      },
+      {
+        "type": "radiacao_dot",
+        "baseAmount": 8,
+        "penetrationRatio": 0.30
+      }
     ],
-    "embeddedTalentIds": [21, 32],
-    "specialStatus": "decaimento_fissao",
-    "description": "Projétil de urânio enriquecido. Causa decaimento físico contínuo por radiação e fissão."
+    "embeddedTalentIds": [
+      21,
+      32,
+      73,
+      82
+    ],
+    "specialStatus": "exposicao",
+    "specialPathStatus": "decaimento_fissao",
+    "allowedPaths": [
+      "dullant_duelista_fratura"
+    ],
+    "description": "Projétil de urânio enriquecido. Causa decaimento contínuo por radiação, fissão e irradiação celular."
   },
   {
     "id": "w47_xacran_vidro",
@@ -44,11 +100,29 @@
     "category": "magicas",
     "rarity": "incomum",
     "damageComponents": [
-      { "type": "maldicao_status", "baseAmount": 18, "penetrationRatio": 0.75 }
+      {
+        "type": "maldicao_status",
+        "baseAmount": 12,
+        "penetrationRatio": 0.75
+      },
+      {
+        "type": "black_flame",
+        "baseAmount": 6,
+        "penetrationRatio": 0.70
+      }
     ],
-    "embeddedTalentIds": [4],
-    "specialStatus": "maldicao_visceral",
-    "description": "Disco giratório que entoa cantos de agonia. Causa dano de Maldição com 75% de penetração mágica e acúmulo de stacks."
+    "embeddedTalentIds": [
+      4,
+      69
+    ],
+    "specialStatus": "corrupcao",
+    "specialPathStatus": "maldicao_visceral",
+    "allowedPaths": [
+      "duja_maldito",
+      "duja_imaculado",
+      "duja_cetico"
+    ],
+    "description": "Disco giratório que entoa cantos de agonia. Causa Maldição com 75% de penetração e acende Chamas Negras (anti-cura)."
   },
   {
     "id": "w54_livro_sangue",
@@ -56,12 +130,289 @@
     "category": "magicas",
     "rarity": "epico",
     "damageComponents": [
-      { "type": "maldicao_status", "baseAmount": 32, "penetrationRatio": 0.85 },
-      { "type": "entropia_pura", "baseAmount": 12, "penetrationRatio": 0.90 }
+      {
+        "type": "blood_sacrifice",
+        "baseAmount": 22,
+        "penetrationRatio": 0.60
+      },
+      {
+        "type": "entropia_pura",
+        "baseAmount": 12,
+        "penetrationRatio": 0.90
+      }
     ],
-    "embeddedTalentIds": [51, 56],
-    "specialStatus": "maldicao_visceral",
-    "description": "Dobra a realidade psíquica do adversário com 85% a 90% de perfuração de resistência mental."
+    "embeddedTalentIds": [
+      51,
+      56,
+      79
+    ],
+    "specialStatus": "corrupcao",
+    "specialPathStatus": "sangue_maculado",
+    "allowedPaths": [
+      "duja_maldito"
+    ],
+    "description": "Dobra a realidade psíquica do adversário com 60% a 90% de perfuração, pagando o custo em sangue."
+  },
+  {
+    "id": "w58_tomo_alquimista",
+    "name": "Tomo do Alquimista",
+    "category": "magicas",
+    "rarity": "epico",
+    "damageComponents": [
+      {
+        "type": "alchemical_fire",
+        "baseAmount": 9,
+        "penetrationRatio": 0.40
+      },
+      {
+        "type": "alchemical_ice",
+        "baseAmount": 9,
+        "penetrationRatio": 0.45
+      },
+      {
+        "type": "alchemical_shock",
+        "baseAmount": 9,
+        "penetrationRatio": 0.55
+      }
+    ],
+    "embeddedTalentIds": [
+      67,
+      75,
+      103
+    ],
+    "specialStatus": "queimadura",
+    "specialPathStatus": "saturacao_alquimica",
+    "allowedPaths": [
+      "duja_cetico"
+    ],
+    "description": "Alterna ciclicamente entre Fogo, Gelo e Raio a cada ataque, saturando reagentes no alvo."
+  },
+  {
+    "id": "w25_machado_gelo_negro",
+    "name": "Machado de Gelo Negro",
+    "category": "martelos",
+    "rarity": "epico",
+    "damageComponents": [
+      {
+        "type": "physical_cleave",
+        "baseAmount": 20,
+        "penetrationRatio": 0.20
+      },
+      {
+        "type": "frost_bite",
+        "baseAmount": 9,
+        "penetrationRatio": 0.40
+      }
+    ],
+    "embeddedTalentIds": [
+      97,
+      113
+    ],
+    "specialStatus": "congelamento",
+    "specialPathStatus": "clandestino_do_permafrost",
+    "allowedPaths": [
+      "dit_metamorfo_evolutivo",
+      "dren_corcovado"
+    ],
+    "description": "Corte congelante que reduz a regeneração e a cadência do inimigo atingido."
+  },
+  {
+    "id": "w45_alinhador_veu",
+    "name": "O Alinhador do Véu",
+    "category": "lancas",
+    "rarity": "lendario",
+    "baseDamage": 38,
+    "damageComponents": [
+      {
+        "type": "polearm_sweep",
+        "baseAmount": 18,
+        "penetrationRatio": 0.30
+      },
+      {
+        "type": "entropia_pura",
+        "baseAmount": 20,
+        "penetrationRatio": 0.90
+      }
+    ],
+    "embeddedTalentIds": [
+      42,
+      105
+    ],
+    "specialStatus": "corrupcao",
+    "specialPathStatus": "decaimento_fissao",
+    "description": "Lança projétil de energia cósmica que cruza toda a tela dissolvendo matéria no Limiar."
+  },
+  {
+    "id": "w30_esmagador_mundos",
+    "name": "O Esmagador de Mundos",
+    "category": "martelos",
+    "rarity": "lendario",
+    "baseDamage": 45,
+    "damageComponents": [
+      {
+        "type": "physical_shatter",
+        "baseAmount": 28,
+        "penetrationRatio": 0.35
+      },
+      {
+        "type": "tomb_weight",
+        "baseAmount": 17,
+        "penetrationRatio": 0.20
+      }
+    ],
+    "embeddedTalentIds": [
+      53,
+      117
+    ],
+    "specialStatus": "atordoamento",
+    "specialPathStatus": "peso_do_tumulo",
+    "allowedPaths": [
+      "dren_corcovado",
+      "dren_espelhado"
+    ],
+    "description": "Ativo: golpeia o chão e congela todos os inimigos na tela por 1s, imprensando-os sob o peso do túmulo."
+  },
+  {
+    "id": "w60_eco_primordial",
+    "name": "O Eco Primordial",
+    "category": "magicas",
+    "rarity": "lendario",
+    "damageComponents": [
+      {
+        "type": "eco_acoustic",
+        "baseAmount": 22,
+        "penetrationRatio": 0.80
+      },
+      {
+        "type": "radiant_holy",
+        "baseAmount": 16,
+        "penetrationRatio": 0.55
+      }
+    ],
+    "embeddedTalentIds": [
+      83,
+      88,
+      100
+    ],
+    "specialStatus": "silencio",
+    "specialPathStatus": "beatificacao_ressonante",
+    "allowedPaths": [
+      "duja_imaculado",
+      "duja_maldito"
+    ],
+    "description": "Dispara feixes de luz que perseguem todos os alvos; a onda de som sagrado silencia elites."
+  },
+  {
+    "id": "d15_olho_bon",
+    "name": "O Olho do Bön",
+    "category": "construtos",
+    "rarity": "lendario",
+    "damageComponents": [
+      {
+        "type": "crystallite_resonance",
+        "baseAmount": 30,
+        "penetrationRatio": 0.80
+      },
+      {
+        "type": "fissao_decay",
+        "baseAmount": 18,
+        "penetrationRatio": 0.55
+      }
+    ],
+    "embeddedTalentIds": [
+      105,
+      114
+    ],
+    "specialStatus": "exposicao",
+    "specialPathStatus": "olho_do_bon",
+    "allowedPaths": [
+      "dullant_duelista_eco",
+      "dullant_duelista_fratura"
+    ],
+    "description": "Construto orbital de ferro meteórico: laser contínuo que perfura tudo em linha e marca o alvo."
+  },
+  {
+    "id": "f03_foice_tumular",
+    "name": "Foice Tumular",
+    "category": "foices",
+    "rarity": "epico",
+    "baseDamage": 28,
+    "damageComponents": [
+      {
+        "type": "rot_necrosis",
+        "baseAmount": 17,
+        "penetrationRatio": 0.35
+      },
+      {
+        "type": "physical_cleave",
+        "baseAmount": 11,
+        "penetrationRatio": 0.25
+      }
+    ],
+    "embeddedTalentIds": [
+      70,
+      78
+    ],
+    "specialStatus": "hemorragia",
+    "specialPathStatus": "status_podre",
+    "allowedPaths": [
+      "dren_corcovado"
+    ],
+    "description": "Gadanha que não mata de imediato: deixa a carne cinzenta e o inimigo lutando contra a própria podridão."
+  },
+  {
+    "id": "a10_pe_de_cabra",
+    "name": "Espinho Ancestral",
+    "category": "adagas",
+    "rarity": "lendario",
+    "baseDamage": 27,
+    "damageComponents": [
+      {
+        "type": "osseous_puncture",
+        "baseAmount": 15,
+        "penetrationRatio": 0.55
+      },
+      {
+        "type": "rot_necrosis",
+        "baseAmount": 12,
+        "penetrationRatio": 0.35
+      }
+    ],
+    "embeddedTalentIds": [
+      62,
+      85
+    ],
+    "specialStatus": "hemorragia",
+    "specialPathStatus": "status_podre",
+    "description": "Ignora a guarda e perfura vida cinza, detonando a podridão restante (efetivo com Dren)."
+  },
+  {
+    "id": "c04_cordao_ecos",
+    "name": "Cordão de Ecos",
+    "category": "chicotes",
+    "rarity": "raro",
+    "baseDamage": 16,
+    "damageComponents": [
+      {
+        "type": "eco_acoustic",
+        "baseAmount": 10,
+        "penetrationRatio": 0.80
+      },
+      {
+        "type": "whip_lash",
+        "baseAmount": 6,
+        "penetrationRatio": 0.18
+      }
+    ],
+    "embeddedTalentIds": [
+      72
+    ],
+    "specialStatus": "fragilidade",
+    "specialPathStatus": "estilhacamento_radiante",
+    "allowedPaths": [
+      "dullant_duelista_eco",
+      "duja_imaculado"
+    ],
+    "description": "Estalos emitem Som Primordial que ignora 80% da defesa física."
   }
 ]
-

@@ -1,12 +1,15 @@
 import Phaser from 'phaser';
 import { CHARACTERS_DATA } from '../data/characters';
-import { TALENTS_CATALOG } from '../data/talents';
-import { getWeaponById } from '../data/weapons';
-import { CharacterId, ItemRarity, LootDropInstance, StatusEffectType, WeaponItem } from '../types';
+import { TALENTS_CATALOG, getTalentsForPath, meetsTalentRequirements } from '../data/talents';
+import { getWeaponById, WEAPONS_DATABASE } from '../data/weapons';
+import { PATHS_CATALOG, getPathsForCharacter } from '../data/paths';
+import { CharacterId, CharacterPathId, ItemRarity, LootDropInstance, StatusEffectType, TalentCard, WeaponItem, SubSkillDefinition } from '../types';
+import { GreyHealthState, PathSpecificStatusType, PathStatusInstance, GREY_HEALTH_RULES } from '../types/damageTypes';
 import { SpriteController } from '../sprites/SpriteController';
 import { ScenarioHook } from '../hooks/ScenarioHook';
 import { LootSystem } from '../systems/loot';
-import { DamageSystem } from '../systems/damage';
+import { DamageSystem, createGreyHealthState } from '../systems/damage';
+import { EffectDispatcher } from '../systems/EffectDispatcher';
 import { CombatEntity } from '../attacks/types';
 import { executeLightAttack } from '../attacks/lightAttack';
 import { executeHeavyAttack } from '../attacks/heavyAttack';
@@ -53,7 +56,24 @@ export class MainArenaScene extends Phaser.Scene {
     hpBar: Phaser.GameObjects.Graphics;
     facing: 'left' | 'right' | 'up' | 'down';
     statusEffects: any[];
+    /** Podridão de Dren - Vida Cinza cumulativa */
+    greyHealth?: GreyHealthState;
+    /** Status de caminho ativos (chamas negras, podre, fissão...) */
+    pathStatuses?: PathStatusInstance[];
+    /** Status clássicos ativos (rachadura, fragilidade, queimadura...) */
+    classicStatuses?: any[];
+    antiHealActive?: boolean;
+    damageDealtMultiplier?: number;
+    isSilenced?: boolean;
+    speedMultiplier?: number;
   }[] = [];
+
+  // Caminho e sub-caminho ativos do Marcado
+  private currentPathId: CharacterPathId = 'dit_metamorfo_multiplo';
+  private currentSubPathId: string | null = null;
+  private currentSubSkillId: string | null = null;
+  private subSkillCooldownUntil: number = 0;
+  private drenLifestealBonus: number = 0;
 
   // Drop mais próximo do jogador para interação de escolha
   private nearestDrop: LootDropInstance | null = null;
@@ -77,10 +97,14 @@ export class MainArenaScene extends Phaser.Scene {
     F: Phaser.Input.Keyboard.Key;
     R: Phaser.Input.Keyboard.Key;
     H: Phaser.Input.Keyboard.Key;
+    V: Phaser.Input.Keyboard.Key;
     ONE: Phaser.Input.Keyboard.Key;
     TWO: Phaser.Input.Keyboard.Key;
     THREE: Phaser.Input.Keyboard.Key;
     FOUR: Phaser.Input.Keyboard.Key;
+    FIVE: Phaser.Input.Keyboard.Key;
+    SIX: Phaser.Input.Keyboard.Key;
+    SEVEN: Phaser.Input.Keyboard.Key;
     SPACE: Phaser.Input.Keyboard.Key;
     SHIFT: Phaser.Input.Keyboard.Key;
   };
@@ -135,7 +159,10 @@ export class MainArenaScene extends Phaser.Scene {
     this.createHUD();
 
     // 8. Log de Boas-Vindas
-    this.showLog('Véu Partido 2.5D Iniciado! Pressione 1, 2, 3, 4 para trocar de classe.');
+    this.showLog('Véu Partido 2.5D Iniciado! Pressione 1, 2, 3, 4 para trocar de classe. [5] Caminho [6] Sub-caminho [V] Sub-habilidade');
+
+    // Expõe a cena para depuração/QA (console do navegador)
+    (window as any).__arenaScene = this;
   }
 
   private setupInputs(): void {
@@ -157,10 +184,14 @@ export class MainArenaScene extends Phaser.Scene {
       F: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F),
       R: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R),
       H: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H),
+      V: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.V),
       ONE: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE),
       TWO: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO),
       THREE: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE),
       FOUR: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR),
+      FIVE: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FIVE),
+      SIX: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SIX),
+      SEVEN: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SEVEN),
       SPACE: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
       SHIFT: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT),
     };
@@ -178,6 +209,12 @@ export class MainArenaScene extends Phaser.Scene {
     this.keys.X.on('down', () => this.handlePlayerAttack(true));
     this.keys.L.on('down', () => this.handlePlayerClassAbility());
     this.keys.C.on('down', () => this.handlePlayerClassAbility());
+
+    // Sub-habilidade do sub-caminho ativo / ciclagem de caminhos
+    this.keys.V.on('down', () => this.handleSubSkill());
+    this.keys.FIVE.on('down', () => this.cyclePath(1));
+    this.keys.SIX.on('down', () => this.cycleSubPath());
+    this.keys.SEVEN.on('down', () => this.showPathOverview());
 
     // Esquiva / Dash
     this.keys.SPACE.on('down', () => this.handlePlayerDash());
@@ -197,7 +234,7 @@ export class MainArenaScene extends Phaser.Scene {
   public selectCharacter(charId: CharacterId): void {
     this.currentCharacterId = charId;
     const charData = CHARACTERS_DATA[charId];
-    this.currentWeapon = getWeaponById(charData.initialWeaponId);
+    this.currentWeapon = this.getDefaultWeaponFor(charId);
 
     // Recalcula pools baseados em PUL e ECO
     this.playerMaxHp = 80 + charData.baseStats.pulso * 15;
@@ -205,12 +242,78 @@ export class MainArenaScene extends Phaser.Scene {
     this.playerMaxEco = 30 + charData.baseStats.eco * 12;
     this.playerEco = this.playerMaxEco;
 
+    // Caminho padrão do Marcado + primeiro sub-caminho
+    this.currentPathId = charData.availablePaths[0];
+    this.currentSubPathId = PATHS_CATALOG[this.currentPathId].subPaths[0]?.id ?? null;
+    this.currentSubSkillId = PATHS_CATALOG[this.currentPathId].subPaths[0]?.subSkill.id ?? null;
+    this.drenLifestealBonus = 0;
+
     if (this.playerSprite) {
       this.playerSprite.setTexture(charData.spriteKey);
       SpriteController.playAnimation(this.playerSprite, charData.spriteKey, 'idle', this.playerFacing);
     }
 
-    this.showLog(`Marcado selecionado: ${charData.name} (${charData.loreRole}) | Origem: ${charData.culturalOrigin}`);
+    const pathName = PATHS_CATALOG[this.currentPathId].name;
+    this.showLog(`${charData.name} (${charData.loreRole}) | Caminho: ${pathName} | Origem: ${charData.culturalOrigin}`);
+    this.debugLogPath();
+  }
+
+  /**
+   * Arma inicial respeitando a restrição de caminho (fallback para a arma canônica do Marcado)
+   */
+  private getDefaultWeaponFor(charId: CharacterId): WeaponItem {
+    const charData = CHARACTERS_DATA[charId];
+    const weapon = getWeaponById(charData.initialWeaponId);
+    if (weapon.allowedPaths && !weapon.allowedPaths.some(p => charData.availablePaths.includes(p))) {
+      const fallback = WEAPONS_DATABASE.find(w => !w.allowedPaths || w.allowedPaths.some(p => charData.availablePaths.includes(p)));
+      return fallback ?? weapon;
+    }
+    return weapon;
+  }
+
+  private debugLogPath(): void {
+    const path = PATHS_CATALOG[this.currentPathId];
+    const sub = path.subPaths.find(s => s.id === this.currentSubPathId);
+    console.info(
+      `[O Véu Partido] Caminho: ${path.name} | Status assinatura: ${path.signatureStatus}` +
+      ` | Sub-caminho: ${sub?.name ?? '-'} | Sub-habilidade [V]: ${sub?.subSkill.name ?? '-'}`
+    );
+  }
+
+  /**
+   * Ciclngem dos caminhos disponíveis do Marcado (tecla 5)
+   */
+  private cyclePath(direction: 1 | -1): void {
+    const available = CHARACTERS_DATA[this.currentCharacterId].availablePaths;
+    const idx = available.indexOf(this.currentPathId);
+    this.currentPathId = available[(idx + direction + available.length) % available.length];
+    this.currentSubPathId = PATHS_CATALOG[this.currentPathId].subPaths[0]?.id ?? null;
+    this.currentSubSkillId = PATHS_CATALOG[this.currentPathId].subPaths[0]?.subSkill.id ?? null;
+    this.showLog(`Caminho alternado: ${PATHS_CATALOG[this.currentPathId].name}`);
+    this.debugLogPath();
+  }
+
+  /**
+   * Ciclngem dos sub-caminhos do caminho atual (tecla 6)
+   */
+  private cycleSubPath(): void {
+    const subs = PATHS_CATALOG[this.currentPathId].subPaths;
+    if (subs.length === 0) return;
+    const idx = subs.findIndex(s => s.id === this.currentSubPathId);
+    const next = subs[(idx + 1) % subs.length];
+    this.currentSubPathId = next.id;
+    this.currentSubSkillId = next.subSkill.id;
+    this.showLog(`Sub-caminho: ${next.name} | [V] ${next.subSkill.name}`);
+  }
+
+  /**
+   * Resumo do catálogo de caminhos/sub-caminhos no log (tecla 7)
+   */
+  private showPathOverview(): void {
+    const paths = getPathsForCharacter(this.currentCharacterId)
+      .map(p => `${p.name} [${p.subPaths.length} sub-caminhos]`)
+      .join(' · ');
+    this.showLog(`Caminhos de ${CHARACTERS_DATA[this.currentCharacterId].name}: ${paths}`);
   }
 
   private spawnTestEnemies(): void {
@@ -238,6 +341,13 @@ export class MainArenaScene extends Phaser.Scene {
         hpBar,
         facing: 'left',
         statusEffects: [],
+        greyHealth: createGreyHealthState(cfg.hp),
+        pathStatuses: [],
+        classicStatuses: [],
+        antiHealActive: false,
+        damageDealtMultiplier: 1,
+        isSilenced: false,
+        speedMultiplier: 1,
       });
     });
   }
@@ -313,10 +423,25 @@ export class MainArenaScene extends Phaser.Scene {
       isDodging: this.isDodging,
       isParrying: this.isParrying,
       isStunned: false,
+      statusEffects: [],
+      pathStatuses: [],
+      currentPath: this.currentPathId,
+      currentSubPathId: this.currentSubPathId ?? undefined,
+      damageDealtMultiplier: 1,
+      speedMultiplier: 1,
       takeDamage: (amount) => {
         this.playerHp = Math.max(0, this.playerHp - amount);
       },
     };
+  }
+
+  /**
+   * Bônus passivos do sub-caminho ativo (dano, resistência, penetração, lifesteal)
+   */
+  private getSubPathModifiers() {
+    const path = PATHS_CATALOG[this.currentPathId];
+    const sub = path?.subPaths.find(s => s.id === this.currentSubPathId);
+    return sub?.passiveModifiers ?? {};
   }
 
   private getEnemiesCombatEntities(): CombatEntity[] {
@@ -340,9 +465,21 @@ export class MainArenaScene extends Phaser.Scene {
         isDodging: false,
         isParrying: false,
         isStunned: false,
+        statusEffects: e.classicStatuses ?? [],
+        pathStatuses: e.pathStatuses,
+        greyHealth: e.greyHealth,
+        antiHealActive: e.antiHealActive,
+        damageDealtMultiplier: e.damageDealtMultiplier,
+        isSilenced: e.isSilenced,
+        speedMultiplier: e.speedMultiplier,
         takeDamage: (amount, isCritical, appliedEffects) => {
           e.hp -= amount;
           this.showDamagePopup(e.sprite.x, e.sprite.y - 20, amount, isCritical);
+
+          // Registra os status clássicos aplicados para que Rachadura/Fragilidade afetem os próximos golpes
+          if (appliedEffects && appliedEffects.length > 0) {
+            this.addClassicStatuses(e, appliedEffects);
+          }
           
           // Flash de dano (Módulo 12.1: piscar em branco por 2 frames)
           e.sprite.setTint(0xffffff);
@@ -356,6 +493,16 @@ export class MainArenaScene extends Phaser.Scene {
             e.sprite.setVisible(false);
             e.hpBar.clear();
 
+            // Podridão: morte 100% cinza espalha a peste para os vizinhos
+            if (e.greyHealth?.isFullyRotten && this.currentCharacterId === 'dren') {
+              const spread = Math.round(e.maxHp * 0.25);
+              for (const other of this.enemies) {
+                if (other.id !== e.id && !other.isDead && Math.hypot(other.sprite.x - e.sprite.x, other.sprite.y - e.sprite.y) < 180) {
+                  this.applyPathStatusToEnemy(other, 'status_podre', spread, 0.30, 8000);
+                }
+              }
+            }
+
             // Gera drop no local da morte
             const drop = this.lootSystem.generateDrop(e.sprite.x, e.sprite.y, 'normal');
             this.createDropVisual(drop);
@@ -366,6 +513,13 @@ export class MainArenaScene extends Phaser.Scene {
             this.time.delayedCall(6000, () => {
               e.isDead = false;
               e.hp = e.maxHp;
+              e.greyHealth = createGreyHealthState(e.maxHp);
+              e.pathStatuses = [];
+              e.classicStatuses = [];
+              e.antiHealActive = false;
+              e.damageDealtMultiplier = 1;
+              e.isSilenced = false;
+              e.speedMultiplier = 1;
               e.sprite.setVisible(true);
             });
           }
@@ -373,8 +527,122 @@ export class MainArenaScene extends Phaser.Scene {
       }));
   }
 
-  private showDamagePopup(x: number, y: number, amount: number, isCritical: boolean): void {
-    const color = isCritical ? '#f59e0b' : '#ffffff';
+  /**
+   * Aplica um status de caminho em um inimigo do cenário (mantém estado entre golpes)
+   */
+  private applyPathStatusToEnemy(
+    enemy: NonNullable<MainArenaScene['enemies'][number]>,
+    status: PathSpecificStatusType,
+    potency: number,
+    penetration: number,
+    durationMs?: number
+  ): void {
+    const entity = this.enemies.find(en => en.id === enemy.id) ?? enemy;
+    const combatEntity: CombatEntity = {
+      id: entity.id,
+      name: entity.name,
+      x: entity.sprite.x,
+      y: entity.sprite.y,
+      width: entity.sprite.width,
+      height: entity.sprite.height,
+      facing: entity.facing,
+      stats: { fratura: 3, pulso: 3, eco: 2, veu: 2, limiar: 2 },
+      currentHp: entity.hp,
+      maxHp: entity.maxHp,
+      currentEco: 0,
+      maxEco: 0,
+      currentWeapon: getWeaponById('w01_gladio_ferro'),
+      activeTalents: [],
+      isDodging: false,
+      isParrying: false,
+      isStunned: false,
+      statusEffects: entity.classicStatuses ?? [],
+      pathStatuses: entity.pathStatuses,
+      greyHealth: entity.greyHealth,
+      antiHealActive: entity.antiHealActive,
+      takeDamage: () => { /* resolução de dano tratada pelo handler principal */ },
+    };
+
+    // Sincroniza a vida cinza já acumulada com a entidade antes de aplicar o novo stack
+    entity.greyHealth = DamageSystem.applyRotToTarget(
+      { ...combatEntity, currentHp: entity.hp, maxHp: entity.maxHp } as CombatEntity,
+      0
+    );
+    combatEntity.greyHealth = entity.greyHealth;
+    combatEntity.pathStatuses = entity.pathStatuses;
+
+    const result = EffectDispatcher.applyPathStatus(
+      combatEntity,
+      status,
+      potency,
+      penetration,
+      durationMs,
+      undefined,
+      this.getPlayerCombatEntity()
+    );
+
+    // Escreve de volta o estado mutado (arrays e estrutura de vida cinza)
+    entity.pathStatuses = combatEntity.pathStatuses ?? [];
+    entity.greyHealth = combatEntity.greyHealth ?? entity.greyHealth;
+    entity.antiHealActive = combatEntity.antiHealActive;
+
+    if (entity.greyHealth) {
+      entity.greyHealth.currentGreyHp = Math.min(entity.hp, entity.greyHealth.currentGreyHp);
+    }
+
+    if (result.exploded && result.damageDealt > 0) {
+      entity.hp -= result.damageDealt;
+      this.showDamagePopup(entity.sprite.x, entity.sprite.y - 35, result.damageDealt, true);
+      this.showLog(result.message ?? 'STATUS DETONADO!');
+    } else if (result.message && (status === 'status_podre' || status === 'chamas_negras')) {
+      this.showLog(result.message);
+    }
+  }
+
+  /**
+   * Registra status clássicos (rachadura, fragilidade, queimadura...) em um inimigo
+   */
+  private addClassicStatuses(
+    enemy: NonNullable<MainArenaScene['enemies'][number]>,
+    effects: StatusEffectType[]
+  ): void {
+    if (!enemy.classicStatuses) enemy.classicStatuses = [];
+    const durations: Partial<Record<StatusEffectType, number>> = {
+      rachadura: 3000,
+      fragilidade: 5000,
+      hemorragia: 4000,
+      queimadura: 4000,
+      veneno: 6000,
+      exposicao: 5000,
+      corrupcao: 4000,
+      lentidao: 3000,
+      atordoamento: 1200,
+      silencio: 3000,
+      congelamento: 4000,
+      sangria_vital: 4000,
+    };
+
+    for (const type of effects) {
+      const existing = enemy.classicStatuses.find((s: any) => s.type === type);
+      const duration = durations[type] ?? 3000;
+      if (existing) {
+        existing.stacks = Math.min(10, existing.stacks + 1);
+        existing.elapsedMs = 0;
+      } else {
+        enemy.classicStatuses.push({
+          type,
+          durationMs: duration,
+          elapsedMs: 0,
+          stacks: 1,
+          tickTimerMs: 0,
+          sourceValue: 10,
+        });
+      }
+    }
+  }
+
+  private showDamagePopup(x: number, y: number, amount: number, isCritical: boolean, colorOverride?: string): void {
+    const color = colorOverride ?? (isCritical ? '#f59e0b' : '#ffffff');
     const text = this.add.text(x, y, `${isCritical ? 'CRÍTICO! ' : ''}${amount}`, {
       fontSize: isCritical ? '18px' : '14px',
       color,
@@ -423,6 +691,18 @@ export class MainArenaScene extends Phaser.Scene {
       isHeavy,
     });
 
+    // Estiramento Visceral do Dren Corcovado: recupera vida proporcional ao dano
+    if (this.currentCharacterId === 'dren' && result.damageDealt > 0) {
+      const mods = this.getSubPathModifiers();
+      const lifestealRatio = 0.12 + (mods.lifestealBonus ?? 0) + this.drenLifestealBonus;
+      const heal = Math.round(result.damageDealt * Math.min(0.60, lifestealRatio));
+      this.playerHp = Math.min(this.playerMaxHp, this.playerHp + heal);
+      this.drenLifestealBonus = Math.min(0.18, this.drenLifestealBonus + 0.02);
+    }
+
+    // Sincroniza a vida vermelha de volta com o cenário e aplica os status de caminho gerados
+    this.syncEnemiesAfterAttack(targets, result);
+
     const charKey = CHARACTERS_DATA[this.currentCharacterId].spriteKey;
     SpriteController.playAnimation(this.playerSprite, charKey, result.animationTriggered as any, this.playerFacing);
 
@@ -431,8 +711,154 @@ export class MainArenaScene extends Phaser.Scene {
     });
 
     if (result.targetsHit > 0) {
-      this.showLog(`Ataque ${isHeavy ? 'Pesado' : 'Leve'} causou ${result.damageDealt} de dano! (${result.targetsHit} alvo(s))`);
+      const extra = result.greyHealthDealt ? ` | Vida Cinza: ${result.greyHealthDealt}` : '';
+      this.showLog(`Ataque ${isHeavy ? 'Pesado' : 'Leve'} causou ${result.damageDealt} de dano! (${result.targetsHit} alvo(s))${extra}`);
     }
+  }
+
+  /**
+   * Recopia a vida e aplica os status de caminho retornados pelos ataques nas entidades do cenário.
+   */
+  private syncEnemiesAfterAttack(
+    targets: CombatEntity[],
+    result: { pathStatusesApplied?: PathSpecificStatusType[]; greyHealthDealt?: number }
+  ): void {
+    for (const t of targets) {
+      const enemy = this.enemies.find(e => e.id === t.id);
+      if (!enemy) continue;
+      enemy.hp = t.currentHp;
+      if (t.greyHealth) enemy.greyHealth = t.greyHealth;
+
+      // Todos os status de caminho retornados pelo golpe são aplicados ao cenário
+      for (const status of result.pathStatusesApplied ?? []) {
+        this.applyPathStatusToEnemy(
+          enemy,
+          status,
+          Math.max(6, Math.round((result.greyHealthDealt ?? 10) * 0.5) + 4),
+          0.30,
+          status === 'chamas_negras' ? 6000 : 8000
+        );
+      }
+    }
+  }
+
+  /**
+   * Sub-habilidade do sub-caminho ativo (tecla V).
+   * Resolve o dano a partir dos componentes declarados em data/paths.ts e aplica
+   * o status exclusivo do sub-caminho.
+   */
+  private handleSubSkill(): void {
+    if (this.isAttacking || this.isDodging || this.isHealing) return;
+
+    const path = PATHS_CATALOG[this.currentPathId];
+    const sub = path?.subPaths.find(s => s.id === this.currentSubPathId);
+    const skill: SubSkillDefinition | undefined = sub?.subSkill;
+    if (!skill) {
+      this.showLog('Nenhum sub-caminho ativo. Pressione [6] para escolher um sub-caminho.');
+      return;
+    }
+
+    const now = Date.now();
+    if (now < this.subSkillCooldownUntil) {
+      this.showLog(`${skill.name} em recarga (${Math.ceil((this.subSkillCooldownUntil - now) / 1000)}s)`);
+      return;
+    }
+    if (this.playerEco < skill.ecoCost) {
+      this.showLog(`Eco insuficiente para ${skill.name} (requer ${skill.ecoCost}).`);
+      return;
+    }
+
+    this.isAttacking = true;
+    this.playerEco -= skill.ecoCost;
+    this.subSkillCooldownUntil = now + skill.cooldownMs;
+
+    const attackerEntity = this.getPlayerCombatEntity();
+    const targets = this.getEnemiesCombatEntities();
+    const mods = this.getSubPathModifiers();
+
+    // Auto-dano de pactos (Sino de Sangue, Sacrifício)
+    if (skill.selfDamageRatio) {
+      const selfDmg = Math.round(this.playerMaxHp * skill.selfDamageRatio);
+      this.playerHp = Math.max(1, this.playerHp - selfDmg);
+    }
+
+    let totalDamage = 0;
+    let hits = 0;
+    const statusApplied: PathSpecificStatusType[] = [];
+
+    for (const target of targets) {
+      const dist = skill.radius
+        ? Math.hypot(target.x - attackerEntity.x, (target.y - attackerEntity.y) * 1.5)
+        : Math.abs(target.x - attackerEntity.x);
+      const inRange = skill.radius ? dist <= skill.radius : dist <= (skill.rangeX ?? 120);
+      if (!inRange) continue;
+      if (!skill.radius && skill.rangeX) {
+        const dirMultiplier = this.playerFacing === 'left' ? -1 : 1;
+        if ((target.x - attackerEntity.x) * dirMultiplier <= 0) continue;
+      }
+
+      const components = skill.damageComponents ?? skill.damageTypes.map(t => ({
+        type: t,
+        baseAmount: Math.round(10 + this.currentWeapon.baseDamage * 0.6),
+        penetrationRatio: skill.penetrationRatio,
+      }));
+
+      const dmgResult = DamageSystem.calculateDamage(
+        attackerEntity,
+        this.currentWeapon,
+        target,
+        false,
+        {
+          activeTalentIds: this.activeTalents,
+          customDamageComponents: components,
+          bonusPenetration: mods.penetrationBonus ?? 0,
+          damageMultiplierBonus: (mods.damageMultiplier ?? 1) - 1,
+        }
+      );
+
+      target.takeDamage(dmgResult.mitigatedDamage, dmgResult.isCritical, dmgResult.appliedEffects);
+      totalDamage += dmgResult.mitigatedDamage;
+      hits++;
+
+      if (skill.inflictedStatus && !statusApplied.includes(skill.inflictedStatus)) {
+        statusApplied.push(skill.inflictedStatus);
+      }
+    }
+
+    // Aplica os status da sub-habilidade no cenário
+    const enemyTargets = this.enemies.filter(e => !e.isDead);
+    for (const status of statusApplied) {
+      for (const enemy of enemyTargets) {
+        const dist = skill.radius
+          ? Math.hypot(enemy.sprite.x - attackerEntity.x, (enemy.sprite.y - attackerEntity.y) * 1.5)
+          : Math.abs(enemy.sprite.x - attackerEntity.x);
+        const inRange = skill.radius ? dist <= skill.radius : dist <= (skill.rangeX ?? 120);
+        if (!inRange) continue;
+        this.applyPathStatusToEnemy(
+          enemy,
+          status,
+          Math.max(10, Math.round(totalDamage / Math.max(1, hits)) * 0.8),
+          skill.penetrationRatio,
+          undefined
+        );
+      }
+    }
+
+    const charKey = CHARACTERS_DATA[this.currentCharacterId].spriteKey;
+    SpriteController.playAnimation(this.playerSprite, charKey, 'spellcast' as any, this.playerFacing);
+
+    if (this.cameras?.main) {
+      this.cameras.main.flash(120, 60, 20, 90);
+    }
+
+    this.showLog(
+      `${skill.name} executada! Dano: ${totalDamage} (${hits} alvo(s))` +
+      (statusApplied.length ? ` | Status: ${statusApplied.join(', ')}` : '')
+    );
+
+    this.time.delayedCall(400, () => {
+      this.isAttacking = false;
+    });
   }
 
   private handlePlayerClassAbility(): void {
@@ -614,32 +1040,179 @@ export class MainArenaScene extends Phaser.Scene {
       }
     }
 
-    // 2. Ordenação de Profundidade 2.5D (Y-sorting essencial)
+    // 2. Processamento dos status (Vida Cinza, Chamas Negras, Fissão, podridão 100%)
+    this.updateEnemyStatuses(delta);
+
+    // 3. Ordenação de Profundidade 2.5D (Y-sorting essencial)
     this.playerSprite.setDepth(this.playerSprite.y);
     this.enemies.forEach(e => {
       if (!e.isDead) {
         e.sprite.setDepth(e.sprite.y);
-        // Atualiza barras de vida dos inimigos
+
+        // Aura visual: cinza quando 100% podre, arroxeada quando amaldiçoado
+        if (e.greyHealth?.isFullyRotten) {
+          e.sprite.setTint(0x9ca3af);
+        } else if (e.antiHealActive) {
+          e.sprite.setTint(0x7c3aed);
+        }
+
+        // Atualiza barras de vida dos inimigos (vida vermelha + vida cinza)
         e.hpBar.clear();
         e.hpBar.fillStyle(0x374151, 0.8);
         e.hpBar.fillRect(e.sprite.x - 20, e.sprite.y - 45, 40, 5);
+
+        const hpRatio = Phaser.Math.Clamp(e.hp / e.maxHp, 0, 1);
+        const greyRatio = Phaser.Math.Clamp((e.greyHealth?.currentGreyHp ?? 0) / e.maxHp, 0, 1);
+
+        // Barra cinza (Podridão de Dren) preenche a partir da direita
+        if (greyRatio > 0) {
+          e.hpBar.fillStyle(0x9ca3af, 1);
+          e.hpBar.fillRect(e.sprite.x - 20 + 40 * Math.max(0, hpRatio - greyRatio), e.sprite.y - 45, 40 * greyRatio, 5);
+        }
+
+        // Barra vermelha restante (vida vermelha = hp - vida cinza)
+        const redRatio = Math.max(0, hpRatio - greyRatio);
         e.hpBar.fillStyle(0xef4444, 1);
-        const fillW = Math.max(0, (e.hp / e.maxHp) * 40);
-        e.hpBar.fillRect(e.sprite.x - 20, e.sprite.y - 45, fillW, 5);
+        e.hpBar.fillRect(e.sprite.x - 20, e.sprite.y - 45, 40 * redRatio, 5);
+
+        // Marcador de falência necrótica
+        if (e.greyHealth?.isFullyRotten) {
+          e.hpBar.lineStyle(1, 0xf59e0b, 1);
+          e.hpBar.strokeRect(e.sprite.x - 20, e.sprite.y - 45, 40, 5);
+        }
+
         e.hpBar.setDepth(e.sprite.y + 1);
       }
     });
 
-    // 3. Verificação de proximidade de Drops para o painel de escolha
+    // 4. Verificação de proximidade de Drops para o painel de escolha
     this.checkNearestDrop();
 
-    // 4. Regeneração passiva sutil de Eco
+    // 5. Regeneração passiva sutil de Eco
     if (this.playerEco < this.playerMaxEco) {
       this.playerEco = Math.min(this.playerMaxEco, this.playerEco + (delta / 1000) * 1.5);
     }
 
-    // 5. Renderização do HUD
+    // 6. Renderização do HUD
     this.renderHUD();
+  }
+
+  /**
+   * Ticks de status dos inimigos:
+   * - Colapso necrótico quando 100% da vida é cinza (dano over time)
+   * - DoT de Chamas Negras, Decaimento de Fissão, Corrosão, etc.
+   * - Expiração dos status clássicos e de caminho
+   */
+  private updateEnemyStatuses(delta: number): void {
+    const now = Date.now();
+
+    for (const enemy of this.enemies) {
+      if (enemy.isDead) continue;
+
+      let hpBefore = enemy.hp;
+
+      // --- 1. COLAPSO NECRÓTICO: vida 100% cinza ---
+      if (enemy.greyHealth && enemy.greyHealth.isFullyRotten && enemy.hp > 0) {
+        enemy.greyHealth.decayDotTimerMs += delta;
+        if (enemy.greyHealth.decayDotTimerMs >= GREY_HEALTH_RULES.FULL_ROT_TICK_MS) {
+          enemy.greyHealth.decayDotTimerMs = 0;
+          const necrosisDmg = Math.max(3, Math.round(enemy.maxHp * GREY_HEALTH_RULES.FULL_ROT_DPS));
+          const greyBurn = Math.round(enemy.greyHealth.currentGreyHp * GREY_HEALTH_RULES.FULL_ROT_GREY_BURN_RATIO);
+          enemy.hp = Math.max(0, enemy.hp - necrosisDmg);
+          enemy.greyHealth.currentGreyHp = Math.min(enemy.hp, Math.max(0, enemy.greyHealth.currentGreyHp - greyBurn));
+          enemy.greyHealth.isFullyRotten = enemy.hp > 0 && enemy.greyHealth.currentGreyHp >= enemy.hp;
+          this.showDamagePopup(enemy.sprite.x, enemy.sprite.y - 55, necrosisDmg, false, '#9ca3af');
+        }
+      }
+
+      // --- 2. DOTS DE STATUS DE CAMINHO ---
+      if (enemy.pathStatuses && enemy.pathStatuses.length > 0) {
+        const remaining: PathStatusInstance[] = [];
+        for (const instance of enemy.pathStatuses) {
+          instance.elapsedMs += delta;
+          instance.tickTimerMs += delta;
+
+          const dotSpec = this.getPathStatusDot(instance.type);
+          if (dotSpec && instance.tickTimerMs >= dotSpec.intervalMs) {
+            instance.tickTimerMs = 0;
+            const dmg = Math.max(2, Math.round(instance.potency * dotSpec.ratio * instance.stacks));
+            enemy.hp = Math.max(0, enemy.hp - dmg);
+            this.showDamagePopup(enemy.sprite.x, enemy.sprite.y - 40, dmg, false, dotSpec.color);
+          }
+
+          if (instance.elapsedMs < instance.durationMs) {
+            remaining.push(instance);
+          } else if (instance.type === 'chamas_negras') {
+            enemy.antiHealActive = remaining.some(s => s.type === 'chamas_negras');
+          }
+        }
+        enemy.pathStatuses = remaining;
+      }
+
+      // --- 3. STATUS CLÁSSICOS (rachadura, fragilidade, queimadura...) ---
+      if (enemy.classicStatuses && enemy.classicStatuses.length > 0) {
+        const remainingClassic: any[] = [];
+        for (const effect of enemy.classicStatuses) {
+          effect.elapsedMs += delta;
+          effect.tickTimerMs = (effect.tickTimerMs ?? 0) + delta;
+
+          if ((effect.type === 'hemorragia' || effect.type === 'queimadura') && effect.tickTimerMs >= 500) {
+            effect.tickTimerMs = 0;
+            const dmg = Math.max(1, Math.round(effect.stacks * 2));
+            enemy.hp = Math.max(0, enemy.hp - dmg);
+          }
+          if (effect.type === 'veneno' && effect.tickTimerMs >= 1000) {
+            effect.tickTimerMs = 0;
+            const dmg = Math.max(1, Math.round(effect.stacks * 3));
+            enemy.hp = Math.max(0, enemy.hp - dmg);
+          }
+
+          if (effect.elapsedMs < effect.durationMs) remainingClassic.push(effect);
+        }
+        enemy.classicStatuses = remainingClassic;
+      }
+
+      // --- 4. Morte por DoT ---
+      if (enemy.hp <= 0 && !enemy.isDead) {
+        enemy.isDead = true;
+        enemy.sprite.setVisible(false);
+        enemy.hpBar.clear();
+        this.showLog(`${enemy.name} sucumbiu às aflições!`);
+        const drop = this.lootSystem.generateDrop(enemy.sprite.x, enemy.sprite.y, 'normal');
+        this.createDropVisual(drop);
+        this.time.delayedCall(6000, () => {
+          enemy.isDead = false;
+          enemy.hp = enemy.maxHp;
+          enemy.greyHealth = createGreyHealthState(enemy.maxHp);
+          enemy.pathStatuses = [];
+          enemy.classicStatuses = [];
+          enemy.antiHealActive = false;
+          enemy.damageDealtMultiplier = 1;
+          enemy.sprite.setVisible(true);
+        });
+      } else if (enemy.hp !== hpBefore) {
+        hpBefore = enemy.hp;
+      }
+    }
+  }
+
+  /**
+   * Tabela de intensidade de DoT por status de caminho (dano relativo à potência do stack)
+   */
+  private getPathStatusDot(status: PathSpecificStatusType): { intervalMs: number; ratio: number; color: string } | null {
+    switch (status) {
+      case 'chamas_negras': return { intervalMs: 500, ratio: 0.15, color: '#a855f7' };
+      case 'decaimento_fissao': return { intervalMs: 1000, ratio: 0.20, color: '#22c55e' };
+      case 'irradiacao_celular': return { intervalMs: 1000, ratio: 0.10, color: '#84cc16' };
+      case 'corrosao_vitriolica': return { intervalMs: 1000, ratio: 0.12, color: '#facc15' };
+      case 'flogisto_incandescente': return { intervalMs: 500, ratio: 0.12, color: '#f97316' };
+      case 'estigma_santo': return { intervalMs: 1000, ratio: 0.06, color: '#fcd34d' };
+      case 'frenesi_predatorio_alfa': return { intervalMs: 500, ratio: 0.10, color: '#dc2626' };
+      case 'sinergia_quimica_hibrida': return { intervalMs: 500, ratio: 0.08, color: '#c084fc' };
+      case 'bomba_de_chumbo': return { intervalMs: 1000, ratio: 0.10, color: '#eab308' };
+      case 'trilha_de_cinzas': return { intervalMs: 1000, ratio: 0.08, color: '#9333ea' };
+      default: return null;
+    }
   }
 
   private checkNearestDrop(): void {
@@ -706,13 +1279,27 @@ export class MainArenaScene extends Phaser.Scene {
       `ARMA: ${this.currentWeapon.name} [${this.currentWeapon.rarity.toUpperCase()}] | POEIRA: ${this.playerPoeiraEco}`
     );
 
-    // Ícones dos Talentos Ativos (Módulo 10)
-    const talentNames = this.activeTalents
-      .map(id => TALENTS_CATALOG.find(t => t.id === id)?.name || `T#${id}`)
-      .slice(0, 4)
-      .join(' | ');
+    // Caminho / Sub-caminho / Sub-habilidade ativos
+    const path = PATHS_CATALOG[this.currentPathId];
+    const sub = path?.subPaths.find(s => s.id === this.currentSubPathId);
+    const subPathLabel = sub ? sub.name : 'sem sub-caminho';
+    const skillLabel = sub ? sub.subSkill.name : '-';
+    const cooldownLeft = Math.max(0, this.subSkillCooldownUntil - Date.now());
 
-    this.hudTalentsText.setText(`TALENTOS: ${talentNames}`);
+    this.hudTalentsText.setText(
+      `CAMINHO: ${path.name} | SUB: ${subPathLabel}\n` +
+      `[V] ${skillLabel} ${cooldownLeft > 0 ? `(${Math.ceil(cooldownLeft / 1000)}s)` : '(pronta)'} | [5] Caminho [6] Sub-caminho`
+    );
+  }
+
+  /**
+   * Lista de talentos liberados para o caminho atual (com requisitos e custo em Poeira)
+   */
+  public getAvailableTalents(): TalentCard[] {
+    const stats = CHARACTERS_DATA[this.currentCharacterId].baseStats;
+    return getTalentsForPath(this.currentPathId)
+      .filter(t => meetsTalentRequirements(stats, t.requirements))
+      .sort((a, b) => a.id - b.id);
   }
 }
 
